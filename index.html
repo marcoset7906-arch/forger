@@ -1866,7 +1866,7 @@ async function analyzeFood(input){
 
     // ── Gemini Vision API ──────────────────────────────────
     // ── OpenRouter Vision API (funciona en España) ─────────
-    const OR_KEY='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';
+    const OR_KEY='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';
     const prompt=`Analiza esta foto de comida y devuelve ÚNICAMENTE un objeto JSON, sin texto extra ni backticks. Formato exacto: {"nombre":"nombre plato","kcal":numero,"prot":numero,"carbs":numero,"grasas":numero,"items":[{"nombre":"ingrediente","kcal":numero}],"nota":"nota breve"}. Estima calorías realistas para una ración española. Si no hay comida: {"error":"No se detecta comida"}`;
 
     const resp=await fetch('https://openrouter.ai/api/v1/chat/completions',{
