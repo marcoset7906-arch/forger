@@ -222,96 +222,29 @@ select.inp{-webkit-appearance:none;}
   <meta name="apple-mobile-web-app-title" content="FORGE">
   <meta name="theme-color" content="#FF4D00">
   <meta name="application-name" content="FORGE">
-  <link id="appleTouchIcon" rel="apple-touch-icon">
-  <link id="pwaManifest" rel="manifest">
-  <script>
-  (function(){
-    // ── Generate icons from base64 ──
-    const I192 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAADR0lEQVR4nO3dUW4aQRBF0SHy9uzF2gskX0gIEYRJd1c175wFRB2oOzVjQnwcAAAAAAAAAAAAAAAAAADtnaoPMNL58zhXnyHF6ec9Zmfrv4SB72PXILY7tKHvb6cYtjmowd/PDiG0P6DB31/nENoezOC/n44htDuQwX9/nUL4U32Aa4Y/Q6f3uU0AnV4U5uvyfpevoi4vBHUqb4lKN4Dh5zhq56AsAMPPtap5KAnA8HNPxVwsD8Dw88jq+WjzUyCosDQAV3+esXJOlgVg+PmNVfOyJADDzytWzI1nAKJN/wSu5Or/beFM8VXzge3MT4ptAKJNDcC9PyPMnCMbgGjTAnD1Z6RZ82QDEG1KAK7+zDBjrmwAogmAaMMDcPvDTKPnywYgmgCIJgCiDQ3A/T8rjJwzG4BoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCI9lF9gG0V/SdRjGUDEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0X4p/1fcmvwvEl/cfsgGIJgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCIJgCiCYBovg/wKv/O/i3YAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBsawOnn8OvTmW7knNkARBMA0QRAtOEBeA5gptHzZQMQTQBEmxKA2yBmmDFXNgDRpgVgCzDSrHmyAYg2NQBbgBFmztHHrD+41JfueM70WyBbgP8xe348AxBtSQC2AK9YMTfLNoAI+I1V87L0FkgEPGPlnHgGINryAGwBHlk9HyUbQATcUzEXZbdAIuBa1TyUPgOIgOOonYM2A3j+PM7VZ2CtDhfANj8F6vBisE6X97tNAMfR50Vhrk7vc5uD3HJL9H46Df5FuwPdEsL+Og7+RduD3RLCfjoP/kX7A94SQn87DP7FNge9Rwx97DT017Y89L8IYp1dBx4AAAAAAAAAAAAAAACAXf0F336Lhni7YoUAAAAASUVORK5CYII=';
-    const I512 = 'data:image/png;base64,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';
-
-    // Apple touch icon
-    document.getElementById('appleTouchIcon').href = I192;
-
-    // Inline manifest as blob
-    const manifest = {
-      name: 'FORGE · Forja tu físico',
-      short_name: 'FORGE',
-      description: 'Tu app de entrenamiento personalizado',
-      start_url: '.',
-      display: 'standalone',
-      background_color: '#080808',
-      theme_color: '#FF4D00',
-      orientation: 'portrait',
-      icons: [
-        { src: I192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-        { src: I512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
-      ]
-    };
-    const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
-    document.getElementById('pwaManifest').href = URL.createObjectURL(blob);
-
-    // ── Inline Service Worker ──
-    if('serviceWorker' in navigator){
-      const swCode = `
-const CACHE='forge-v1';
-const ASSETS=['/'];
-self.addEventListener('install',e=>{
-  e.waitUntil(caches.open(CACHE).then(c=>c.addAll([])).then(()=>self.skipWaiting()));
-});
-self.addEventListener('activate',e=>{
-  e.waitUntil(clients.claim());
-});
-self.addEventListener('fetch',e=>{
-  e.respondWith(
-    caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/')))
-  );
-});
-`;
-      const swBlob = new Blob([swCode], {type:'text/javascript'});
-      const swUrl = URL.createObjectURL(swBlob);
-      navigator.serviceWorker.register(swUrl).catch(()=>{});
-    }
-
-    // ── Install prompt ──
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', e => {
-      e.preventDefault();
-      deferredPrompt = e;
-      // Show install banner after 3 seconds if not standalone
-      if(window.matchMedia('(display-mode: standalone)').matches) return;
-      setTimeout(()=>{
-        if(!localStorage.getItem('forge_installed')){
-          showInstallBanner(deferredPrompt);
-        }
-      }, 3000);
-    });
-
-    function showInstallBanner(prompt){
-      const el = document.createElement('div');
-      el.id = 'installBanner';
-      el.style.cssText='position:fixed;bottom:72px;left:16px;right:16px;z-index:800;background:linear-gradient(135deg,#FF4D00,#FFB800);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 8px 32px rgba(255,77,0,.4);animation:slideUp .4s ease;';
-      el.innerHTML=`
-        <div>
-          <div style="font-family:'Bebas Neue';font-size:18px;letter-spacing:2px;color:#000;">INSTALAR FORGE</div>
-          <div style="font-size:12px;color:rgba(0,0,0,.7);margin-top:2px;">Añadir a pantalla de inicio como app</div>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button id="installYes" style="background:#000;color:#FF4D00;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;font-family:'DM Sans',sans-serif;">Instalar</button>
-          <button id="installNo" style="background:rgba(0,0,0,.25);color:#000;border:none;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:700;cursor:pointer;">✕</button>
-        </div>`;
-      document.body.appendChild(el);
-      document.getElementById('installYes').onclick=()=>{
-        prompt.prompt();
-        prompt.userChoice.then(()=>{el.remove();localStorage.setItem('forge_installed','1');});
-      };
-      document.getElementById('installNo').onclick=()=>{el.remove();};
-    }
-  })();
-  </script>
+  <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAADR0lEQVR4nO3dUW4aQRBF0SHy9uzF2gskX0gIEYRJd1c175wFRB2oOzVjQnwcAAAAAAAAAAAAAAAAAADtnaoPMNL58zhXnyHF6ec9Zmfrv4SB72PXILY7tKHvb6cYtjmowd/PDiG0P6DB31/nENoezOC/n44htDuQwX9/nUL4U32Aa4Y/Q6f3uU0AnV4U5uvyfpevoi4vBHUqb4lKN4Dh5zhq56AsAMPPtap5KAnA8HNPxVwsD8Dw88jq+WjzUyCosDQAV3+esXJOlgVg+PmNVfOyJADDzytWzI1nAKJN/wSu5Or/beFM8VXzge3MT4ptAKJNDcC9PyPMnCMbgGjTAnD1Z6RZ82QDEG1KAK7+zDBjrmwAogmAaMMDcPvDTKPnywYgmgCIJgCiDQ3A/T8rjJwzG4BoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCI9lF9gG0V/SdRjGUDEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0X4p/1fcmvwvEl/cfsgGIJgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAogmAaAIgmgCIJgCiCYBovg/wKv/O/i3YAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBsawOnn8OvTmW7knNkARBMA0QRAtOEBeA5gptHzZQMQTQBEmxKA2yBmmDFXNgDRpgVgCzDSrHmyAYg2NQBbgBFmztHHrD+41JfueM70WyBbgP8xe348AxBtSQC2AK9YMTfLNoAI+I1V87L0FkgEPGPlnHgGINryAGwBHlk9HyUbQATcUzEXZbdAIuBa1TyUPgOIgOOonYM2A3j+PM7VZ2CtDhfANj8F6vBisE6X97tNAMfR50Vhrk7vc5uD3HJL9H46Df5FuwPdEsL+Og7+RduD3RLCfjoP/kX7A94SQn87DP7FNge9Rwx97DT017Y89L8IYp1dBx4AAAAAAAAAAAAAAACAXf0F336Lhni7YoUAAAAASUVORK5CYII=">
+  <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiRk9SR0UgwrcgRm9yamEgdHUgZsOtc2ljbyIsInNob3J0X25hbWUiOiJGT1JHRSIsImRlc2NyaXB0aW9uIjoiVHUgYXBwIGRlIGVudHJlbmFtaWVudG8gcGVyc29uYWxpemFkbyIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMDgwODA4IiwidGhlbWVfY29sb3IiOiIjRkY0RDAwIiwib3JpZW50YXRpb24iOiJwb3J0cmFpdCIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQU1BQUFBREFDQVlBQUFCUzNHd0hBQUFEUjBsRVFWUjRuTzNkVVc0YVFSQkYwU0h5OXV6RjJnc2tYMGdJRVlSSmQxYzE3NXdGUkIyb096VmpRbndjQUFBQUFBQUFBQUFBQUFBQUFBRHRuYW9QTU5MNTh6aFhueUhGNmVjOVptZnJ2NFNCNzJQWElMWTd0S0h2YjZjWXRqbW93ZC9QRGlHMFA2REIzMS9uRU5vZXpPQy9uNDRodER1UXdYOS9uVUw0VTMyQWE0WS9RNmYzdVUwQW5WNFU1dXZ5ZnBldm9pNHZCSFVxYjRsS040RGg1emhxNTZBc0FNUFB0YXA1S0FuQThITlB4VndzRDhEdzg4anErV2p6VXlDb3NEUUFWMytlc1hKT2xnVmcrUG1OVmZPeUpBRER6eXRXekkxbkFLSk4vd1N1NU9yL2JlRk04Vlh6Z2UzTVQ0cHRBS0pORGNDOVB5UE1uQ01iZ0dqVEFuRDFaNlJaODJRREVHMUtBSzcrekRCanJtd0FvZ21BYU1NRGNQdkRUS1BueXdZZ21nQ0lKZ0NpRFEzQS9UOHJqSnd6RzRCb0FpQ2FBSWdtQUtJSmdHZ0NJSm9BaUNZQW9nbUFhQUlnbWdDSTlsRjlnRzBWL1NkUmpHVURFRTBBUkJNQTBRUkFOQUVRVFFCRUV3RFJCRUEwQVJCTkFFUVRBTkVFUURRQkVFMEFSQk1BMFFSQU5BRVFUUUJFRXdEUkJFQTBYNHAvMWZjbXZ3dkVsL2Nmc2dHSUpnQ2lDWUJvQWlDYUFJZ21BS0lKZ0dnQ0lKb0FpQ1lBb2dtQWFBSWdtZ0NJSmdDaUNZQm92Zy93S3YvTy9pM1lBRVFUQU5FRVFEUUJFRTBBUkJNQTBRUkFOQUVRVFFCRUV3RFJCRUEwQVJCTkFFUVRBTkVFUURRQkVFMEFSQk1BMFFSQU5BRVFUUUJFRXdEUkJFQTBBUkJOQUVRVEFORUVRRFFCRUUwQVJCTUEwUVJBTkFFUVRRQkVFd0RSQkVBMEFSQk5BRVFUQU5FRVFEUUJFRTBBUkJzYXdPbm44T3ZUbVc3a25Oa0FSQk1BMFFSQXRPRUJlQTVncHRIelpRTVFUUUJFbXhLQTJ5Qm1tREZYTmdEUnBnVmdDekRTckhteUFZZzJOUUJiZ0JGbXp0SEhyRCs0MUpmdWVNNzBXeUJiZ1A4eGUzNDhBeEJ0U1FDMkFLOVlNVGZMTm9BSStJMVY4N0wwRmtnRVBHUGxuSGdHSU5yeUFHd0JIbGs5SHlVYlFBVGNVekVYWmJkQUl1QmExVHlVUGdPSWdPT29uWU0yQTNqK1BNN1ZaMkN0RGhmQU5qOEY2dkJpc0U2WDk3dE5BTWZSNTBWaHJrN3ZjNXVEM0hKTDlINDZEZjVGdXdQZEVzTCtPZzcrUmR1RDNSTENmam9QL2tYN0E5NFNRbjg3RFA3Rk5nZTlSd3g5N0RUMDE3WTg5TDhJWXAxZEJ4NEFBQUFBQUFBQUFBQUFBQUNBWGYwRjMzNkxobmk3WW9VQUFBQUFTVVZPUks1Q1lJST0iLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIiwicHVycG9zZSI6ImFueSBtYXNrYWJsZSJ9LHsic3JjIjoiZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFnQUFBQUlBQ0FZQUFBRDBlTlQ2QUFBSzdVbEVRVlI0bk8zYldYTGJWaEJBVVNqbDdkbUxUUmFvZk1nVjJiRkVjUUF4OUQxbkJTaTl4KzVya0Y0V0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQitldG43QVRpdjErL0w2OTdQQUN6THl6OW1PYmR6YWJqSWtvZHpFd2Q4eHNYZ1A1WTlOSWdDbGtVQXBGbjR3TElJZ2lxSEhtUHBBNWVJZ1E0SFBaeUZEenhDRU16bFlJZXkrSUUxQ1lGNUhPZ2dsajZ3QlRFd2cwTWN3T0lIOWlBRXpzM2huWmpGRHh5QkVEZ25oM1l5bGo1d1pHTGdQQnpVU1ZqOHdKa0lnZVA3YSs4SDRHdVdQM0EyNXRieEtiUUQ4d0VDSnZBMjRKZ2N5Z0ZaL01CRVF1QllITWFCV1B4QWdSQTRCcjhCT0FqTEg2Z3c3NDVCaGUzTUJ3RW84elpnUDk0QTdNanlCK3JNd2YwSWdKMjQ5QUJ2ek1OOWVQV3lNUmNkNEhPK0V0aU9Od0Fic3Z3QkxqTW50eU1BTnVKU0Exekh2TnlHVnkxUDVpSUQzTTlYQXMvakRjQVRXZjRBanpGSG4wY0FQSWxMQzdBTzgvUTVCTUFUdUt3QTZ6SlgxeWNBVnVhU0FqeUgrYm91QWJBaWx4UGd1Y3paOVFpQWxiaVVBTnN3YjljaEFGYmdNZ0pzeTl4OW5BQjRrRXNJc0Evejl6RUM0QUV1SDhDK3pPSDdDWUE3dVhRQXgyQWUzMGNBM01GbEF6Z1djL2wyQXVCR0xobkFNWm5QdHhFQU4zQzVBSTdObkw2ZUFMaVNTd1Z3RHViMWRRUUFBQVFKZ0N1b1NZQnpNYmUvSmdDKzRCSUJuSlA1ZlprQXVNRGxBVGczYy94ekFnQUFnZ1RBSjFRandBem0rY2NFd0FkY0ZvQlp6UFUvQ1lEL2NVa0FaakxmZnljQUFDQklBUHhDSFFMTVpzNi9Fd0EvdVJRQURlYjlHd0VBQUVFQ1lGR0RBRFhtL3JKODIvc0JPTEcvODU4ZjJOK1BsNzJmZ0pQS3Z3RlFnUUJOOWZtZkR3QUFLRW9IUUwzK0FPcktleUFiQU9WREIrQmRkUjlrQXdBQXlwSUJVSzA5QUQ1VzNBdkpBQUNBT2dFQUFFRzVBQ2krNWdIZ2E3WDlrQXNBQUNBV0FMVzZBK0EycFQyUkNnQUE0RTBtQUVwVkI4RDlLdnNpRXdBQXdEc0JBQUJCaVFDb3ZNNEJZQjJGdlpFSUFBRGdkK01Eb0ZCeEFLeHYrdjRZSHdBQXdKOEVBQUFFQ1FBQUNCb2RBTk8vdndIZ3VTYnZrZEVCQUFCOFRBQUFRTkRZQUpqODJnYUE3VXpkSjJNREFBRDRuQUFBZ0NBQkFBQkJJd05nNnZjMUFPeGo0bDRaR1FBQXdHVUNBQUNDQkFBQUJBa0FBQWdhRndBVGY2Z0J3UDZtN1pkeEFRQUFmRTBBQUVDUUFBQ0FJQUVBQUVFQ0FBQ0NCQUFBQkkwS2dHbi9SUU9BWTVtMFowWUZBQUJ3SFFFQUFFRUNBQUNDQkFBQUJBa0FBQWdTQUFBUUpBQUFJRWdBQUVDUUFBQ0FJQUVBQUVFQ0FBQ0NCQUFBQkFrQUFBZ1NBQUFRSkFBQUlFZ0FBRUNRQUFDQUlBRUFBRUVDQUFDQ0JBQUFCQWtBQUFnU0FBQVFKQUFBSUVnQUFFQ1FBQUNBb0c5N1B3Q004T05sN3ljQXVJazNBQUFRSkFBQUlFZ0FBRUNRQUFDQUlBRUFBRUVDQUFDQ0JBQUFCQWtBQUFnU0FBQVFKQUFBSUVnQUFFQ1FBQUNBSUFFQUFFRUNBQUNDQkFBQUJBa0FBQWdTQUFBUUpBQUFJRWdBQUVDUUFBQ0FJQUVBQUVFQ0FBQ0NCQUFBQkFrQUFBZ1NBQUFRSkFBQUlFZ0FBRUNRQUFDQUlBRUFBRUVDQUFDQ0JBQUFCQWtBQUFnU0FBQVFKQUFBSUVnQUFFQ1FBQUNBSUFFQUFFRUNBQUNDQkFBQUJBa0FBQWdTQUFBUUpBQUFJRWdBQUVDUUFBQ0FJQUVBQUVFQ0FBQ0NCQUFBQkFrQUFBZ1NBQUFRSkFBQUlFZ0FBRUNRQUFDQUlBRUFBRUVDQUFDQ0JBQUFCSDNiK3dGZ2hMOWY5MzRDYnZIalplOG5nTjE1QXdBQVFRSUFBSUlFQUFBRUNRQUFDQklBQUJBa0FBQWdTQUFBUUpBQUFJQWdBUUFBUVFJQUFJSUVBQUFFQ1FBQUNCSUFBQkFrQUFBZ1NBQUFRSkFBQUlBZ0FRQUFRUUlBQUlJRUFBQUVDUUFBQ0JJQUFCQWtBQUFnU0FBQVFKQUFBSUFnQVFBQVFRSUFBSUlFQUFBRUNRQUFDQklBQUJBa0FBQWdTQUFBUUpBQUFJQWdBUUFBUVFJQUFJSUVBQUFFQ1FBQUNCSUFBQkFrQUFBZ1NBQUFRSkFBQUlBZ0FRQUFRZC8yZmdBWTRjZkwzazhBY0JOdkFBQWdTQUFBUUpBQUFJQWdBUUFBUVFJQUFJSUVBQUFFQ1FBQUNCSUFBQkFrQUFBZ1NBQUFRSkFBQUlBZ0FRQUFRUUlBQUlJRUFBQUVDUUFBQ0JJQUFCQWtBQUFnU0FBQVFKQUFBSUFnQVFBQVFRSUFBSUlFQUFBRUNRQUFDQklBQUJBa0FBQWdTQUFBUUpBQUFJQWdBUUFBUVFJQUFJSUVBQUFFQ1FBQUNCSUFBQkFrQUFBZ1NBQUFRSkFBQUlBZ0FRQUFRUUlBQUlJRUFBQUVDUUFBQ0JJQUFCQWtBQUFnU0FBQVFKQUFBSUFnQVFBQVFRSUFBSUlFQUFBRUNRQUFDQklBQUJBa0FBQWdTQUFBUUpBQUFJQWdBUUFBUVFJQUFJSUVBQUFFQ1FBQUNCSUFBQkFrQUFBZ1NBQUFRSkFBQUlBZ0FRQUFRUUlBQUlJRUFBQUVDUUFBQ0JJQUFCQWtBQUFnU0FBQVFKQUFBSUFnQVFBQVFRSUFBSUlFQUFBRUNRQUFDQklBQUJBa0FBQWdTQUFBUUpBQUFJQWdBUUFBUVFJQUFJSUVBQUFFQ1FBQUNCSUFBQkFrQUFBZ1NBQUFRSkFBQUlBZ0FRQUFRUUlBQUlJRUFBQUVDUUFBQ0JJQUFCQWtBQUFnU0FBQVFKQUFBSUFnQVFBQVFRSUFBSUlFQUFBRUNRQUFDQklBQUJBa0FBQWdTQUFBUUpBQUFJQWdBUUFBUVFJQUFJSUVBQUFFalFxQWwzK1dsNzJmQVlDNUp1MlpVUUVBQUZ4SEFBQkFrQUFBZ0NBQkFBQkJBZ0FBZ2dRQUFBU05DNEJKLzBVRGdPT1l0bC9HQlFBQThEVUJBQUJCQWdBQWdnUUFBQVNORElCcFA5UUFZRjhUOThySUFBQUFMaE1BQUJBa0FBQWdhR3dBVFB5K0JvRHRUZDBuWXdNQUFQaWNBQUNBb05FQk1QVzFEUURibUx4SFJnY0FBUEF4QVFBQVFRSUFBSUxHQjhEazcyOEFlSjdwKzJOOEFBQUFmMG9Fd1BTS0EyQmRoYjJSQ0FBQTRIY0NBQUNDTWdGUWVKMER3T01xK3lJVEFBREF1MVFBVktvT2dQdVU5a1FxQUFDQU43a0FLTlVkQU5lcjdZZGNBQUFBQWdBQWtwSUJVSHZOQThCbHhiMlFEQUFBcU1zR1FMSDJBUGhUZFI5a0EyQlp1b2NPd0p2eUhrZ0hBQUJVWmN2blY2L2ZsOWU5bndHQWJaWC85YjhzM2dBQVFKSUFXRlFnUUkyNUx3QUFJRWtBL0tRR0FSck0remNDNEJjdUJjQnM1dnc3QVFBQVFRTGdmOVFod0V6bSsrOEV3QWRjRW9CWnpQVS9DWUJQdUN3QU01am5IeE1BQUJBa0FDNVFqUURuWm81L1RnQjh3ZVVCT0Nmeit6SUJjQVdYQ09CY3pPMnZDUUFBQ0JJQVYxS1RBT2RnWGw5SEFOekFwUUk0Tm5QNmVnTGdSaTRYd0RHWno3Y1JBSGR3eVFDT3hWeStuUUM0azhzR2NBem04WDBFd0FOY09vQjltY1AzRXdBUGN2a0E5bUgrUGtZQXJNQWxCTmlXdWZzNEFiQVNseEZnRytidE9nVEFpbHhLZ09jeVo5Y2pBRmJtY2dJOGgvbTZMZ0h3QkM0cHdMck0xZlVKZ0NkeFdRSFdZWjQraHdCNElwY1c0REhtNlBQNHcyN2s5ZnZ5dXZjekFKeUZ4Zjk4M2dCc3hHVUd1STU1dVEwQnNDR1hHdUF5YzNJNy90QTc4WlVBd0R1TGYzdmVBT3pFWlFkNFl4N3VRd0RzeUtVSDZzekIvZmpESDRTdkJJQVNpMzkvM2dBY2hBOERVR0hlSFlORE9DQnZBNENKTFA1amNSZ0hKZ1NBQ1N6K1kzSW9KeUFFZ0RPeStJL05id0JPd0ljSU9CdHo2L2djME1sNEd3QWNtY1YvSGc3cXhNUUFjQVNXL2prNXRBR0VBTEFIaS8vY0hONGdRZ0RZZ3NVL2cwTWNTZ3dBYTdMMDUzR2d3d2tCNEJFVy8xd09Oa1lRQUpkWStCME9Pa3dNQU10aTZWYzVkUDRqQ0tEQndtZFpCQUJmRUFWd2JwWTluM0V4dUpzNGdHT3c1QUVBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBR0JOL3dKRk9YUmV3UmljUEFBQUFBQkpSVTVFcmtKZ2dnPT0iLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIiwicHVycG9zZSI6ImFueSBtYXNrYWJsZSJ9XX0=">
   <style>
   @keyframes slideUp{from{transform:translateY(80px);opacity:0}to{transform:translateY(0);opacity:1}}
   </style>
+  <script>
+  if('serviceWorker' in navigator){
+    const sw=`const CACHE='forge-v2';self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>clients.claim());self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>new Response('offline')));}); `;
+    const url=URL.createObjectURL(new Blob([sw],{type:'text/javascript'}));
+    navigator.serviceWorker.register(url).catch(()=>{});
+  }
+  let _dp;
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_dp=e;if(!window.matchMedia('(display-mode:standalone)').matches&&!localStorage.getItem('forge_installed'))setTimeout(()=>_showBanner(),3000);});
+  function _showBanner(){
+    if(document.getElementById('iBanner'))return;
+    const el=document.createElement('div');
+    el.id='iBanner';
+    el.style.cssText='position:fixed;bottom:72px;left:16px;right:16px;z-index:800;background:linear-gradient(135deg,#FF4D00,#FFB800);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 8px 32px rgba(255,77,0,.4);animation:slideUp .4s ease;';
+    el.innerHTML='<div><div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:2px;color:#000;">INSTALAR FORGE</div><div style="font-size:12px;color:rgba(0,0,0,.7);margin-top:2px;">Añadir a pantalla de inicio como app</div></div><div style="display:flex;gap:8px;"><button onclick="_doInstall()" style="background:#000;color:#FF4D00;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;">Instalar</button><button onclick="this.closest('#iBanner').remove()" style="background:rgba(0,0,0,.25);color:#000;border:none;border-radius:8px;padding:9px 12px;font-size:18px;cursor:pointer;">✕</button></div>';
+    document.body.appendChild(el);
+  }
+  function _doInstall(){if(_dp){_dp.prompt();_dp.userChoice.then(()=>{document.getElementById('iBanner')?.remove();localStorage.setItem('forge_installed','1');});}}
+  </script>
 </head>
 <body>
 
@@ -1528,6 +1461,31 @@ function renderNutrition(){
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);border-radius:10px;"><span style="font-size:13px;font-weight:700;">🟢 Core / plancha</span><span style="font-family:'Bebas Neue';font-size:22px;color:var(--green)">30–45s</span></div>
   </div>`;
 
+  // ── Calorie photo counter card ──────────────────────────
+  const _d=db(); const _tk=today();
+  const _logged=(_d.calorieLog&&_d.calorieLog[_tk])||[];
+  const _kcal=_logged.reduce((a,b)=>a+(b.kcal||0),0);
+  const _prot=_logged.reduce((a,b)=>a+(b.prot||0),0);
+  const _calCard=`<div style="margin:0 16px 14px;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+    <div style="padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;">
+      <div><div style="font-family:'Bebas Neue';font-size:20px;letter-spacing:2px;color:var(--accent);">📸 CALORÍAS DE HOY</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:1px;">Haz una foto y la IA estima las calorías</div></div>
+      <div style="text-align:right;"><div style="font-family:'Bebas Neue';font-size:28px;color:${_kcal>0?'var(--accent2)':' var(--muted)'};">${_kcal}</div>
+      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;">kcal hoy</div></div>
+    </div>
+    ${_kcal>0?`<div style="display:flex;gap:8px;padding:0 16px 10px;">
+      <div style="flex:1;background:rgba(255,184,0,.1);border-radius:8px;padding:8px;text-align:center;"><div style="font-family:'Bebas Neue';font-size:20px;color:var(--accent2);">${_kcal}</div><div style="font-size:9px;color:var(--muted);">KCAL</div></div>
+      <div style="flex:1;background:rgba(0,230,118,.08);border-radius:8px;padding:8px;text-align:center;"><div style="font-family:'Bebas Neue';font-size:20px;color:var(--green);">${_prot}g</div><div style="font-size:9px;color:var(--muted);">PROTEÍNA</div></div>
+      <div style="flex:1;background:rgba(255,77,0,.08);border-radius:8px;padding:8px;text-align:center;"><div style="font-family:'Bebas Neue';font-size:20px;color:var(--accent);">${_logged.length}</div><div style="font-size:9px;color:var(--muted);">COMIDAS</div></div>
+    </div>`:''}
+    <div style="padding:0 16px 14px;display:flex;gap:8px;">
+      <label style="flex:1;background:var(--accent);color:#000;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;text-align:center;display:block;" for="photoCalInput">📷 Hacer foto a comida</label>
+      <input type="file" id="photoCalInput" accept="image/*" capture="environment" style="display:none;" onchange="analyzeFood(this)">
+      ${_kcal>0?`<button onclick="openCalLog()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:10px;padding:11px 14px;font-size:12px;font-weight:700;cursor:pointer;">📋 Ver registro</button>`:''}
+    </div>
+  </div>`;
+  html=_calCard+html;
+
   body.innerHTML=html;
   // scroll selected tab into view
   setTimeout(()=>{const tabs=body.querySelector('[style*="overflow-x"]');const on=tabs?.querySelector('[style*="rgba(255,77,0,.12)"]');if(on)on.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});},60);
@@ -1871,6 +1829,194 @@ function calcStreak(){
   }
   return streak;
 }
+
+
+// ════════════════════════════════════════════════════════
+// CALORIE PHOTO ANALYZER (Claude Vision API)
+// ════════════════════════════════════════════════════════
+async function analyzeFood(input){
+  const file=input.files[0];
+  if(!file)return;
+  input.value='';
+
+  // Show loading overlay
+  const ov=document.createElement('div');
+  ov.id='calOv';
+  ov.style.cssText='position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
+  ov.innerHTML=`
+    <div style="width:60px;height:60px;border:4px solid rgba(255,77,0,.2);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;"></div>
+    <div style="font-family:'Bebas Neue';font-size:20px;letter-spacing:3px;color:var(--accent);">ANALIZANDO...</div>
+    <div style="font-size:13px;color:var(--muted);">La IA está estimando las calorías</div>`;
+  document.body.appendChild(ov);
+  if(!document.getElementById('spinStyle')){
+    const s=document.createElement('style');s.id='spinStyle';
+    s.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(s);
+  }
+
+  try {
+    // Convert image to base64
+    const b64=await new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=()=>res(r.result.split(',')[1]);
+      r.onerror=rej;
+      r.readAsDataURL(file);
+    });
+    const mt=file.type||'image/jpeg';
+
+    // ── Gemini Vision API ──────────────────────────────────
+    // ── OpenRouter Vision API (funciona en España) ─────────
+    const OR_KEY='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';
+    const prompt=`Analiza esta foto de comida y devuelve ÚNICAMENTE un objeto JSON, sin texto extra ni backticks. Formato exacto: {"nombre":"nombre plato","kcal":numero,"prot":numero,"carbs":numero,"grasas":numero,"items":[{"nombre":"ingrediente","kcal":numero}],"nota":"nota breve"}. Estima calorías realistas para una ración española. Si no hay comida: {"error":"No se detecta comida"}`;
+
+    const resp=await fetch('https://openrouter.ai/api/v1/chat/completions',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+OR_KEY,
+        'HTTP-Referer':'https://forge-phi-liart.vercel.app',
+        'X-Title':'FORGE'
+      },
+      body:JSON.stringify({
+        model:'openrouter/free',
+        messages:[{
+          role:'user',
+          content:[
+            {type:'image_url',image_url:{url:'data:'+mt+';base64,'+b64}},
+            {type:'text',text:prompt}
+          ]
+        }],
+        max_tokens:600
+      })
+    });
+
+    const data=await resp.json();
+    ov.remove();
+
+    if(data.error){showToast('❌ '+(data.error.message||'Error de API'));return;}
+
+    let result;
+    try{
+      const txt=data.choices?.[0]?.message?.content||'';
+      const match=txt.match(/\{[\s\S]*\}/);
+      if(!match)throw new Error('Sin JSON: '+txt.slice(0,100));
+      result=JSON.parse(match[0]);
+    }catch(e){showToast('❌ Respuesta inesperada. Intenta de nuevo.');console.error(e);return;}
+
+    if(result.error){showToast('⚠️ '+result.error);return;}
+
+    // Show result modal
+    showFoodResult(result, b64, mt);
+
+  } catch(e){
+    ov?.remove();
+    showToast('❌ '+( e.message||'Error de conexión'));
+    console.error(e);
+  }
+}
+
+function showFoodResult(r, b64, mt){
+  const el=document.createElement('div');
+  el.id='foodResOv';
+  el.style.cssText='position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;';
+  el.innerHTML=`
+    <div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:0 0 24px;">
+      <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto;"></div>
+      <div style="padding:0 16px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <img src="data:${mt};base64,${b64}" style="width:72px;height:72px;object-fit:cover;border-radius:12px;border:1px solid var(--border);">
+          <div>
+            <div style="font-family:'Bebas Neue';font-size:20px;letter-spacing:1px;">${r.nombre||'Comida'}</div>
+            <div style="font-size:12px;color:var(--muted);">${r.nota||''}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
+          <div style="background:rgba(255,184,0,.12);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-family:'Bebas Neue';font-size:24px;color:var(--accent2);">${r.kcal}</div>
+            <div style="font-size:9px;color:var(--muted);">KCAL</div>
+          </div>
+          <div style="background:rgba(0,230,118,.08);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-family:'Bebas Neue';font-size:24px;color:var(--green);">${r.prot}g</div>
+            <div style="font-size:9px;color:var(--muted);">PROT</div>
+          </div>
+          <div style="background:rgba(100,160,255,.08);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-family:'Bebas Neue';font-size:24px;color:var(--blue);">${r.carbs}g</div>
+            <div style="font-size:9px;color:var(--muted);">CARBS</div>
+          </div>
+          <div style="background:rgba(255,77,0,.08);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-family:'Bebas Neue';font-size:24px;color:var(--accent);">${r.grasas}g</div>
+            <div style="font-size:9px;color:var(--muted);">GRASAS</div>
+          </div>
+        </div>
+        ${r.items&&r.items.length?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:14px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">INGREDIENTES DETECTADOS</div>
+          ${r.items.map(it=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text2);">${it.nombre}</span><span style="font-family:'Space Mono';color:var(--accent2);">${it.kcal} kcal</span></div>`).join('')}
+        </div>`:''}
+        <div style="display:flex;gap:8px;">
+          <button onclick="logFood(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;">✅ Añadir al registro</button>
+          <button onclick="document.getElementById('foodResOv').remove()" style="background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:12px;padding:14px 18px;font-size:14px;cursor:pointer;">✕</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+}
+
+function logFood(r){
+  document.getElementById('foodResOv')?.remove();
+  const d=db();
+  if(!d.calorieLog)d.calorieLog={};
+  const tk=today();
+  if(!d.calorieLog[tk])d.calorieLog[tk]=[];
+  d.calorieLog[tk].push({
+    nombre:r.nombre,kcal:r.kcal,prot:r.prot,carbs:r.carbs,grasas:r.grasas,
+    time:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})
+  });
+  save(d);
+  showToast('✅ +'+r.kcal+' kcal añadidas');
+  if(currentPage==='nutrition')renderNutrition();
+}
+
+function openCalLog(){
+  const d=db();const tk=today();
+  const logged=(d.calorieLog&&d.calorieLog[tk])||[];
+  const total=logged.reduce((a,b)=>a+(b.kcal||0),0);
+  const prot=logged.reduce((a,b)=>a+(b.prot||0),0);
+  const el=document.createElement('div');
+  el.id='calLogOv';
+  el.style.cssText='position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;';
+  let items=logged.length?logged.slice().reverse().map(e=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div><div style="font-size:13px;font-weight:700;">${e.nombre}</div><div style="font-size:11px;color:var(--muted);">${e.time||''} · ${e.prot||0}g prot · ${e.carbs||0}g carbs</div></div>
+      <div style="font-family:'Bebas Neue';font-size:20px;color:var(--accent2);">${e.kcal}</div>
+    </div>`).join(''):'<div style="font-size:13px;color:var(--muted);text-align:center;padding:20px 0;">Sin comidas registradas hoy</div>';
+  el.innerHTML=`
+    <div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:0 0 24px;">
+      <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto;"></div>
+      <div style="padding:0 16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div style="font-family:'Bebas Neue';font-size:22px;letter-spacing:2px;">REGISTRO DE HOY</div>
+          <div style="text-align:right;"><div style="font-family:'Bebas Neue';font-size:26px;color:var(--accent2);">${total} kcal</div><div style="font-size:10px;color:var(--muted);">${prot}g proteína</div></div>
+        </div>
+        ${items}
+        ${logged.length?`<button onclick="clearCalLog()" style="width:100%;margin-top:12px;background:transparent;border:1px solid rgba(255,77,0,.3);color:var(--accent);border-radius:10px;padding:10px;font-size:12px;cursor:pointer;">🗑 Borrar registro de hoy</button>`:''}
+        <button onclick="document.getElementById('calLogOv').remove()" style="width:100%;margin-top:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:10px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;">Cerrar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+}
+
+function clearCalLog(){
+  if(!confirm('¿Borrar el registro de hoy?'))return;
+  const d=db();const tk=today();
+  if(d.calorieLog)delete d.calorieLog[tk];
+  save(d);
+  document.getElementById('calLogOv')?.remove();
+  if(currentPage==='nutrition')renderNutrition();
+  showToast('🗑 Registro borrado');
+}
+
 
 window.addEventListener('DOMContentLoaded',initSetup);
 </script>
