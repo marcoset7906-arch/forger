@@ -240,7 +240,7 @@ select.inp{-webkit-appearance:none;}
     const el=document.createElement('div');
     el.id='iBanner';
     el.style.cssText='position:fixed;bottom:72px;left:16px;right:16px;z-index:800;background:linear-gradient(135deg,#FF4D00,#FFB800);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 8px 32px rgba(255,77,0,.4);animation:slideUp .4s ease;';
-    el.innerHTML='<div><div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:2px;color:#000;">INSTALAR FORGE</div><div style="font-size:12px;color:rgba(0,0,0,.7);margin-top:2px;">Añadir a pantalla de inicio como app</div></div><div style="display:flex;gap:8px;"><button onclick="_doInstall()" style="background:#000;color:#FF4D00;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;">Instalar</button><button onclick="this.closest('#iBanner').remove()" style="background:rgba(0,0,0,.25);color:#000;border:none;border-radius:8px;padding:9px 12px;font-size:18px;cursor:pointer;">✕</button></div>';
+    el.innerHTML='<div><div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:2px;color:#000;">INSTALAR FORGE</div><div style="font-size:12px;color:rgba(0,0,0,.7);margin-top:2px;">Añadir a pantalla de inicio como app</div></div><div style="display:flex;gap:8px;"><button onclick="_doInstall()" style="background:#000;color:#FF4D00;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;">Instalar</button><button onclick="document.getElementById('iBanner').remove()" style="background:rgba(0,0,0,.25);color:#000;border:none;border-radius:8px;padding:9px 12px;font-size:18px;cursor:pointer;">✕</button></div>';
     document.body.appendChild(el);
   }
   function _doInstall(){if(_dp){_dp.prompt();_dp.userChoice.then(()=>{document.getElementById('iBanner')?.remove();localStorage.setItem('forge_installed','1');});}}
@@ -489,6 +489,46 @@ const MEALS_WEEK={
       {t:'22:00',lbl:'Cena',icon:'🥚',name:'Cena ligera cierre semana',desc:'Tortilla francesa de 3 huevos con espinacas + 100g arroz integral + 1 cda aceite de oliva',kcal:'~440',prot:'26g',carb:'50g'},
       {t:'23:30',lbl:'Pre-sueño',icon:'🍶',name:'Proteína nocturna',desc:'200g queso fresco batido + frutos rojos + 1 cda semillas chía',kcal:'~180',prot:'18g',carb:'12g'},
     ]},
+  domingo:{name:'Domingo',focus:'Piernas + Core',type:'Multiestación',icon:'🦵',
+    warmup:'5 min bicicleta estática + 15 sentadillas sin peso + rotaciones de cadera.',
+    duration:'~60 min',
+    blocks:[
+      {label:'BLOQUE A · PIERNAS',color:'var(--accent)'},
+      {label:'BLOQUE B · CORE',color:'var(--green)'},
+    ],
+    exercises:[
+      {id:'s1',block:0,name:'Leg extension',sets:4,reps:'10',rt:'heavy',
+       muscles:['quads'],
+       tip:'Extensión completa arriba. Baja en 3s. 1s de pausa en extensión máxima.'},
+      {id:'s2',block:0,name:'Leg curl',sets:4,reps:'10',rt:'heavy',
+       muscles:['hamstrings'],
+       tip:'Caderas pegadas al banco. Baja en 4s. Excéntrico lento = más músculo.'},
+      {id:'s3',block:0,name:'Sentadilla',sets:4,reps:'8',rt:'heavy',
+       muscles:['quads','glutes','hamstrings'],
+       tip:'Rodillas sobre los pies. Muslos paralelos al suelo. Talones pegados siempre.'},
+      {id:'s4',block:0,name:'Gemelos en máquina',sets:4,reps:'15',rt:'medium',
+       muscles:['calves'],
+       tip:'Rango completo. Talón abajo del todo. 2s en punta máxima. Baja en 2s.'},
+      {id:'s5',block:1,name:'Crunch en máquina',sets:3,reps:'12',rt:'core',
+       muscles:['abs'],
+       tip:'Exhala al contraer. No uses cuello ni brazos. Solo abdomen.'},
+      {id:'s6',block:1,name:'Plancha',sets:3,reps:'30s',rt:'core',isTime:true,
+       muscles:['abs','obliques'],
+       tip:'Cuerpo recto. Core apretado. Respira con control.'},
+      {id:'s7',block:1,name:'Elevaciones de piernas tumbado',sets:3,reps:'12',rt:'core',
+       muscles:['abs','hip_flexors'],
+       tip:'Lumbar pegada al banco. Piernas casi rectas. Baja sin que el talón toque.'},
+      {id:'s8',block:1,name:'Plancha lateral',sets:3,reps:'25s',rt:'core',isTime:true,
+       muscles:['obliques','abs'],
+       tip:'Cada lado. Codo bajo el hombro. Caderas alineadas. No dejes caer la cadera.'},
+      {id:'s9',block:1,name:'Crunch bicicleta',sets:3,reps:'20 c/lado',rt:'core',
+       muscles:['abs','obliques'],
+       tip:'Codo al lado contrario alternando despacio y controlado.'},
+      {id:'s10',block:1,name:'Plancha con elevación de brazo',sets:3,reps:'10 c/lado',rt:'core',
+       muscles:['abs','obliques'],
+       tip:'Desde plancha, eleva el brazo al frente 2s. La cadera no gira.'},
+    ]},
+
 };
 const TIPS=['Superávit calórico +300–500 kcal todos los días.','Dormir 7–8h. La mayor parte del músculo crece al dormir.','Progresar cada semana: +1 rep, +1 serie o +carga.','Mínimo 12 semanas antes de valorar resultados reales.','2.5–3L de agua al día. La deshidratación frena el rendimiento.','Calentar 5–10 min antes de cada sesión.','Si fallas un día, al siguiente lo retomas sin excusas.'];
 
@@ -571,47 +611,7 @@ const WK={
   jueves:{name:'Jueves',focus:'Descanso',type:'',icon:'😴',exercises:[],rest:true},
   viernes:{name:'Viernes',focus:'Descanso',type:'',icon:'😴',exercises:[],rest:true},
 
-  sabado:{name:'Sábado',focus:'Piernas + Core',type:'Multiestación',icon:'🦵',
-    warmup:'5 min bicicleta estática + 15 sentadillas sin peso + rotaciones de cadera.',
-    duration:'~60 min',
-    blocks:[
-      {label:'BLOQUE A · PIERNAS',color:'var(--accent)'},
-      {label:'BLOQUE B · CORE',color:'var(--green)'},
-    ],
-    exercises:[
-      {id:'s1',block:0,name:'Leg extension',sets:4,reps:'10',rt:'heavy',
-       muscles:['quads'],
-       tip:'Extensión completa arriba. Baja en 3s. 1s de pausa en extensión máxima.'},
-      {id:'s2',block:0,name:'Leg curl',sets:4,reps:'10',rt:'heavy',
-       muscles:['hamstrings'],
-       tip:'Caderas pegadas al banco. Baja en 4s. Excéntrico lento = más músculo.'},
-      {id:'s3',block:0,name:'Sentadilla',sets:4,reps:'8',rt:'heavy',
-       muscles:['quads','glutes','hamstrings'],
-       tip:'Rodillas sobre los pies. Muslos paralelos al suelo. Talones pegados siempre.'},
-      {id:'s4',block:0,name:'Gemelos en máquina',sets:4,reps:'15',rt:'medium',
-       muscles:['calves'],
-       tip:'Rango completo. Talón abajo del todo. 2s en punta máxima. Baja en 2s.'},
-      {id:'s5',block:1,name:'Crunch en máquina',sets:3,reps:'12',rt:'core',
-       muscles:['abs'],
-       tip:'Exhala al contraer. No uses cuello ni brazos. Solo abdomen.'},
-      {id:'s6',block:1,name:'Plancha',sets:3,reps:'30s',rt:'core',isTime:true,
-       muscles:['abs','obliques'],
-       tip:'Cuerpo recto. Core apretado. Respira con control.'},
-      {id:'s7',block:1,name:'Elevaciones de piernas tumbado',sets:3,reps:'12',rt:'core',
-       muscles:['abs','hip_flexors'],
-       tip:'Lumbar pegada al banco. Piernas casi rectas. Baja sin que el talón toque.'},
-      {id:'s8',block:1,name:'Plancha lateral',sets:3,reps:'25s',rt:'core',isTime:true,
-       muscles:['obliques','abs'],
-       tip:'Cada lado. Caderas alineadas. No dejes caer la cadera en ningún momento.'},
-      {id:'s9',block:1,name:'Crunch bicicleta',sets:3,reps:'20 c/lado',rt:'core',
-       muscles:['abs','obliques'],
-       tip:'Codo al lado contrario alternando despacio y controlado. Sin tirar del cuello.'},
-      {id:'s10',block:1,name:'Plancha con elevación de brazo',sets:3,reps:'10 c/lado',rt:'core',
-       muscles:['abs','obliques'],
-       tip:'Desde plancha, eleva el brazo al frente 2s. Antirotación pura. La cadera no gira.'},
-    ]},
-
-  domingo:{name:'Domingo',focus:'Torso Completo',type:'Multiestación',icon:'🏋️',
+  sabado:{name:'Sábado',focus:'Torso Completo',type:'Multiestación',icon:'🏋️',
     warmup:'5 min elíptica + rotaciones de hombro × 15 + 10 press con barra vacía.',
     duration:'~60 min',
     blocks:[
@@ -653,7 +653,47 @@ const WK={
        muscles:['obliques','abs'],
        tip:'Cada lado. Codo bajo el hombro. Caderas alineadas. No dejes caer la cadera.'},
     ]},
+   domingo:{name:'Domingo',focus:'Piernas + Core',type:'Multiestación',icon:'🦵',
+    warmup:'5 min bicicleta estática + 15 sentadillas sin peso + rotaciones de cadera.',
+    duration:'~60 min',
+    blocks:[
+      {label:'BLOQUE A · PIERNAS',color:'var(--accent)'},
+      {label:'BLOQUE B · CORE',color:'var(--green)'},
+    ],
+    exercises:[
+      {id:'s1',block:0,name:'Leg extension',sets:4,reps:'10',rt:'heavy',
+       muscles:['quads'],
+       tip:'Extensión completa arriba. Baja en 3s. 1s de pausa en extensión máxima.'},
+      {id:'s2',block:0,name:'Leg curl',sets:4,reps:'10',rt:'heavy',
+       muscles:['hamstrings'],
+       tip:'Caderas pegadas al banco. Baja en 4s. Excéntrico lento = más músculo.'},
+      {id:'s3',block:0,name:'Sentadilla',sets:4,reps:'8',rt:'heavy',
+       muscles:['quads','glutes','hamstrings'],
+       tip:'Rodillas sobre los pies. Muslos paralelos al suelo. Talones pegados siempre.'},
+      {id:'s4',block:0,name:'Gemelos en máquina',sets:4,reps:'15',rt:'medium',
+       muscles:['calves'],
+       tip:'Rango completo. Talón abajo del todo. 2s en punta máxima. Baja en 2s.'},
+      {id:'s5',block:1,name:'Crunch en máquina',sets:3,reps:'12',rt:'core',
+       muscles:['abs'],
+       tip:'Exhala al contraer. No uses cuello ni brazos. Solo abdomen.'},
+      {id:'s6',block:1,name:'Plancha',sets:3,reps:'30s',rt:'core',isTime:true,
+       muscles:['abs','obliques'],
+       tip:'Cuerpo recto. Core apretado. Respira con control.'},
+      {id:'s7',block:1,name:'Elevaciones de piernas tumbado',sets:3,reps:'12',rt:'core',
+       muscles:['abs','hip_flexors'],
+       tip:'Lumbar pegada al banco. Piernas casi rectas. Baja sin que el talón toque.'},
+      {id:'s8',block:1,name:'Plancha lateral',sets:3,reps:'25s',rt:'core',isTime:true,
+       muscles:['obliques','abs'],
+       tip:'Cada lado. Caderas alineadas. No dejes caer la cadera en ningún momento.'},
+      {id:'s9',block:1,name:'Crunch bicicleta',sets:3,reps:'20 c/lado',rt:'core',
+       muscles:['abs','obliques'],
+       tip:'Codo al lado contrario alternando despacio y controlado. Sin tirar del cuello.'},
+      {id:'s10',block:1,name:'Plancha con elevación de brazo',sets:3,reps:'10 c/lado',rt:'core',
+       muscles:['abs','obliques'],
+       tip:'Desde plancha, eleva el brazo al frente 2s. Antirotación pura. La cadera no gira.'},
+    ]}
 };
+
 
 // ════════════════════════════════════════════════════════
 // STORAGE
@@ -810,19 +850,37 @@ function renderHome(){
   setTimeout(()=>drawWChart('homeWChart'),50);
 
   // Water tracker
-  const water=(d.water||{})[today()]||0;
-  let glasses='';
-  for(let i=0;i<8;i++)glasses+=`<button class="glass-btn${i<water?' full':''}" onclick="setWater(${i+1})">💧</button>`;
+  const _wData=db().water||{};
+  const _wToday=_wData[today()]||{ml:0};
+  const _wML=_wToday.ml||0;
+  const _wGoal=2500;
+  const _wPct=Math.min(100,Math.round(_wML/_wGoal*100));
+  const _wEntries=_wToday.entries||[];
   document.getElementById('waterDiv').innerHTML=`
     <div class="water-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div style="font-size:14px;font-weight:700;">💧 Hidratación diaria</div>
-        <div style="font-family:'Bebas Neue';font-size:22px;color:var(--blue);">${water}<span style="font-size:12px;color:var(--muted)">/8</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div><div style="font-size:14px;font-weight:700;">💧 Hidratación diaria</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px;">Objetivo: ${_wGoal}ml</div></div>
+        <div style="text-align:right;">
+          <div style="font-family:'Bebas Neue';font-size:24px;color:var(--blue);line-height:1;">${_wML}<span style="font-size:12px;color:var(--muted)">ml</span></div>
+          <div style="font-size:10px;color:var(--muted);">${_wPct}% del objetivo</div>
+        </div>
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">${glasses}</div>
-      <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
-        <div style="height:100%;width:${water/8*100}%;background:linear-gradient(90deg,var(--blue),#80D8FF);border-radius:2px;transition:width .4s;"></div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button onclick="addWater(250)" style="flex:1;background:rgba(64,196,255,.12);border:1.5px solid rgba(64,196,255,.3);color:#40C4FF;border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <span style="font-size:20px;">🥛</span>Vaso<span style="font-size:10px;opacity:.7;">250ml</span>
+        </button>
+        <button onclick="addWater(500)" style="flex:1;background:rgba(64,196,255,.12);border:1.5px solid rgba(64,196,255,.3);color:#40C4FF;border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <span style="font-size:20px;">🍶</span>Botella<span style="font-size:10px;opacity:.7;">500ml</span>
+        </button>
+        <button onclick="openCustomWater()" style="flex:1;background:rgba(64,196,255,.12);border:1.5px solid rgba(64,196,255,.3);color:#40C4FF;border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <span style="font-size:20px;">✏️</span>Personalizado<span style="font-size:10px;opacity:.7;">ml</span>
+        </button>
       </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:${_wEntries.length?'10px':'0'};">
+        <div style="height:100%;width:${_wPct}%;background:linear-gradient(90deg,#40C4FF,#80D8FF);border-radius:3px;transition:width .4s;"></div>
+      </div>
+      ${_wEntries.length?`<div style="display:flex;flex-wrap:wrap;gap:5px;">${_wEntries.map((e,i)=>`<div style="background:rgba(64,196,255,.1);border:1px solid rgba(64,196,255,.2);border-radius:6px;padding:3px 8px;font-size:11px;color:#40C4FF;display:flex;align-items:center;gap:4px;">${e.ml}ml <span onclick="removeWaterEntry(${i})" style="cursor:pointer;opacity:.6;font-size:13px;line-height:1;">×</span></div>`).join('')}</div>`:''}
     </div>`;
 
   // Today's workout
@@ -846,9 +904,48 @@ function renderHome(){
     </div>`;
 }
 
-function setWater(n){
+function addWater(ml){
   const d=db();if(!d.water)d.water={};
-  d.water[today()]=n;save(d);renderHome();showToast('💧 '+n+'/8 vasos');
+  const tk=today();
+  if(!d.water[tk])d.water[tk]={ml:0,entries:[]};
+  d.water[tk].ml=(d.water[tk].ml||0)+ml;
+  if(!d.water[tk].entries)d.water[tk].entries=[];
+  d.water[tk].entries.push({ml});
+  save(d);renderHome();showToast('💧 +'+ml+'ml · Total: '+d.water[tk].ml+'ml');
+}
+
+function removeWaterEntry(idx){
+  const d=db();if(!d.water)return;
+  const tk=today();if(!d.water[tk])return;
+  const entries=d.water[tk].entries||[];
+  if(entries[idx]){d.water[tk].ml=Math.max(0,(d.water[tk].ml||0)-entries[idx].ml);entries.splice(idx,1);}
+  d.water[tk].entries=entries;save(d);renderHome();
+}
+
+function openCustomWater(){
+  const el=document.createElement('div');
+  el.id='customWaterOv';
+  el.style.cssText='position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:20px;';
+  el.innerHTML=`<div style="background:var(--bg2);border-radius:18px;padding:24px;width:100%;max-width:320px;">
+    <div style="font-family:'Bebas Neue';font-size:22px;letter-spacing:2px;margin-bottom:6px;">CANTIDAD PERSONALIZADA</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Introduce los ml que has bebido</div>
+    <input id="customWaterInp" type="number" placeholder="Ej: 330" min="1" max="2000"
+      style="width:100%;background:var(--bg3);border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:13px;font-size:18px;text-align:center;box-sizing:border-box;margin-bottom:12px;">
+    <div style="display:flex;gap:8px;">
+      <button onclick="document.getElementById('customWaterOv').remove()" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:12px;font-size:13px;cursor:pointer;">Cancelar</button>
+      <button onclick="_confirmCustomWater()" style="flex:1;background:#40C4FF;color:#000;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;">💧 Añadir</button>
+    </div>
+  </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+  setTimeout(()=>document.getElementById('customWaterInp')?.focus(),200);
+}
+
+function _confirmCustomWater(){
+  const ml=+document.getElementById('customWaterInp')?.value;
+  if(!ml||ml<1){showToast('Introduce una cantidad válida');return;}
+  document.getElementById('customWaterOv')?.remove();
+  addWater(ml);
 }
 
 // ════════════════════════════════════════════════════════
@@ -1461,32 +1558,8 @@ function renderNutrition(){
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);border-radius:10px;"><span style="font-size:13px;font-weight:700;">🟢 Core / plancha</span><span style="font-family:'Bebas Neue';font-size:22px;color:var(--green)">30–45s</span></div>
   </div>`;
 
-  // ── Calorie photo counter card ──────────────────────────
-  const _d=db(); const _tk=today();
-  const _logged=(_d.calorieLog&&_d.calorieLog[_tk])||[];
-  const _kcal=_logged.reduce((a,b)=>a+(b.kcal||0),0);
-  const _prot=_logged.reduce((a,b)=>a+(b.prot||0),0);
-  const _calCard=`<div style="margin:0 16px 14px;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
-    <div style="padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;">
-      <div><div style="font-family:'Bebas Neue';font-size:20px;letter-spacing:2px;color:var(--accent);">📸 CALORÍAS DE HOY</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:1px;">Haz una foto y la IA estima las calorías</div></div>
-      <div style="text-align:right;"><div style="font-family:'Bebas Neue';font-size:28px;color:${_kcal>0?'var(--accent2)':' var(--muted)'};">${_kcal}</div>
-      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;">kcal hoy</div></div>
-    </div>
-    ${_kcal>0?`<div style="display:flex;gap:8px;padding:0 16px 10px;">
-      <div style="flex:1;background:rgba(255,184,0,.1);border-radius:8px;padding:8px;text-align:center;"><div style="font-family:'Bebas Neue';font-size:20px;color:var(--accent2);">${_kcal}</div><div style="font-size:9px;color:var(--muted);">KCAL</div></div>
-      <div style="flex:1;background:rgba(0,230,118,.08);border-radius:8px;padding:8px;text-align:center;"><div style="font-family:'Bebas Neue';font-size:20px;color:var(--green);">${_prot}g</div><div style="font-size:9px;color:var(--muted);">PROTEÍNA</div></div>
-      <div style="flex:1;background:rgba(255,77,0,.08);border-radius:8px;padding:8px;text-align:center;"><div style="font-family:'Bebas Neue';font-size:20px;color:var(--accent);">${_logged.length}</div><div style="font-size:9px;color:var(--muted);">COMIDAS</div></div>
-    </div>`:''}
-    <div style="padding:0 16px 14px;display:flex;gap:8px;">
-      <label style="flex:1;background:var(--accent);color:#000;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;text-align:center;display:block;" for="photoCalInput">📷 Hacer foto a comida</label>
-      <input type="file" id="photoCalInput" accept="image/*" capture="environment" style="display:none;" onchange="analyzeFood(this)">
-      ${_kcal>0?`<button onclick="openCalLog()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:10px;padding:11px 14px;font-size:12px;font-weight:700;cursor:pointer;">📋 Ver registro</button>`:''}
-    </div>
-  </div>`;
-  html=_calCard+html;
-
   body.innerHTML=html;
+
   // scroll selected tab into view
   setTimeout(()=>{const tabs=body.querySelector('[style*="overflow-x"]');const on=tabs?.querySelector('[style*="rgba(255,77,0,.12)"]');if(on)on.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});},60);
 }
@@ -1834,179 +1907,6 @@ function calcStreak(){
 // ════════════════════════════════════════════════════════
 // CALORIE PHOTO ANALYZER (Claude Vision API)
 // ════════════════════════════════════════════════════════
-async function analyzeFood(input){
-  const file=input.files[0];
-  if(!file)return;
-  input.value='';
-
-  // Show loading overlay
-  const ov=document.createElement('div');
-  ov.id='calOv';
-  ov.style.cssText='position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
-  ov.innerHTML=`
-    <div style="width:60px;height:60px;border:4px solid rgba(255,77,0,.2);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;"></div>
-    <div style="font-family:'Bebas Neue';font-size:20px;letter-spacing:3px;color:var(--accent);">ANALIZANDO...</div>
-    <div style="font-size:13px;color:var(--muted);">La IA está estimando las calorías</div>`;
-  document.body.appendChild(ov);
-  if(!document.getElementById('spinStyle')){
-    const s=document.createElement('style');s.id='spinStyle';
-    s.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
-    document.head.appendChild(s);
-  }
-
-  try {
-    // Convert image to base64
-    const b64=await new Promise((res,rej)=>{
-      const r=new FileReader();
-      r.onload=()=>res(r.result.split(',')[1]);
-      r.onerror=rej;
-      r.readAsDataURL(file);
-    });
-    const mt=file.type||'image/jpeg';
-
-    // ── Gemini Vision API ──────────────────────────────────
-    // ── OpenRouter Vision API (funciona en España) ─────────
-    const OR_KEY='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';
-    const prompt=`Analiza esta foto de comida y devuelve ÚNICAMENTE un objeto JSON, sin texto extra ni backticks. Formato exacto: {"nombre":"nombre plato","kcal":numero,"prot":numero,"carbs":numero,"grasas":numero,"items":[{"nombre":"ingrediente","kcal":numero}],"nota":"nota breve"}. Estima calorías realistas para una ración española. Si no hay comida: {"error":"No se detecta comida"}`;
-
-    const resp=await fetch('https://openrouter.ai/api/v1/chat/completions',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer '+OR_KEY,
-        'HTTP-Referer':'https://forge-phi-liart.vercel.app',
-        'X-Title':'FORGE'
-      },
-      body:JSON.stringify({
-        model:'openrouter/free',
-        messages:[{
-          role:'user',
-          content:[
-            {type:'image_url',image_url:{url:'data:'+mt+';base64,'+b64}},
-            {type:'text',text:prompt}
-          ]
-        }],
-        max_tokens:600
-      })
-    });
-
-    const data=await resp.json();
-    ov.remove();
-
-    if(data.error){showToast('❌ '+(data.error.message||'Error de API'));return;}
-
-    let result;
-    try{
-      const txt=data.choices?.[0]?.message?.content||'';
-      const match=txt.match(/\{[\s\S]*\}/);
-      if(!match)throw new Error('Sin JSON: '+txt.slice(0,100));
-      result=JSON.parse(match[0]);
-    }catch(e){showToast('❌ Respuesta inesperada. Intenta de nuevo.');console.error(e);return;}
-
-    if(result.error){showToast('⚠️ '+result.error);return;}
-
-    // Show result modal
-    showFoodResult(result, b64, mt);
-
-  } catch(e){
-    ov?.remove();
-    showToast('❌ '+( e.message||'Error de conexión'));
-    console.error(e);
-  }
-}
-
-function showFoodResult(r, b64, mt){
-  const el=document.createElement('div');
-  el.id='foodResOv';
-  el.style.cssText='position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;';
-  el.innerHTML=`
-    <div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:0 0 24px;">
-      <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto;"></div>
-      <div style="padding:0 16px;">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-          <img src="data:${mt};base64,${b64}" style="width:72px;height:72px;object-fit:cover;border-radius:12px;border:1px solid var(--border);">
-          <div>
-            <div style="font-family:'Bebas Neue';font-size:20px;letter-spacing:1px;">${r.nombre||'Comida'}</div>
-            <div style="font-size:12px;color:var(--muted);">${r.nota||''}</div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
-          <div style="background:rgba(255,184,0,.12);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-family:'Bebas Neue';font-size:24px;color:var(--accent2);">${r.kcal}</div>
-            <div style="font-size:9px;color:var(--muted);">KCAL</div>
-          </div>
-          <div style="background:rgba(0,230,118,.08);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-family:'Bebas Neue';font-size:24px;color:var(--green);">${r.prot}g</div>
-            <div style="font-size:9px;color:var(--muted);">PROT</div>
-          </div>
-          <div style="background:rgba(100,160,255,.08);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-family:'Bebas Neue';font-size:24px;color:var(--blue);">${r.carbs}g</div>
-            <div style="font-size:9px;color:var(--muted);">CARBS</div>
-          </div>
-          <div style="background:rgba(255,77,0,.08);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-family:'Bebas Neue';font-size:24px;color:var(--accent);">${r.grasas}g</div>
-            <div style="font-size:9px;color:var(--muted);">GRASAS</div>
-          </div>
-        </div>
-        ${r.items&&r.items.length?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:14px;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">INGREDIENTES DETECTADOS</div>
-          ${r.items.map(it=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text2);">${it.nombre}</span><span style="font-family:'Space Mono';color:var(--accent2);">${it.kcal} kcal</span></div>`).join('')}
-        </div>`:''}
-        <div style="display:flex;gap:8px;">
-          <button onclick="logFood(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;">✅ Añadir al registro</button>
-          <button onclick="document.getElementById('foodResOv').remove()" style="background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:12px;padding:14px 18px;font-size:14px;cursor:pointer;">✕</button>
-        </div>
-      </div>
-    </div>`;
-  document.body.appendChild(el);
-  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
-}
-
-function logFood(r){
-  document.getElementById('foodResOv')?.remove();
-  const d=db();
-  if(!d.calorieLog)d.calorieLog={};
-  const tk=today();
-  if(!d.calorieLog[tk])d.calorieLog[tk]=[];
-  d.calorieLog[tk].push({
-    nombre:r.nombre,kcal:r.kcal,prot:r.prot,carbs:r.carbs,grasas:r.grasas,
-    time:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})
-  });
-  save(d);
-  showToast('✅ +'+r.kcal+' kcal añadidas');
-  if(currentPage==='nutrition')renderNutrition();
-}
-
-function openCalLog(){
-  const d=db();const tk=today();
-  const logged=(d.calorieLog&&d.calorieLog[tk])||[];
-  const total=logged.reduce((a,b)=>a+(b.kcal||0),0);
-  const prot=logged.reduce((a,b)=>a+(b.prot||0),0);
-  const el=document.createElement('div');
-  el.id='calLogOv';
-  el.style.cssText='position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;';
-  let items=logged.length?logged.slice().reverse().map(e=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
-      <div><div style="font-size:13px;font-weight:700;">${e.nombre}</div><div style="font-size:11px;color:var(--muted);">${e.time||''} · ${e.prot||0}g prot · ${e.carbs||0}g carbs</div></div>
-      <div style="font-family:'Bebas Neue';font-size:20px;color:var(--accent2);">${e.kcal}</div>
-    </div>`).join(''):'<div style="font-size:13px;color:var(--muted);text-align:center;padding:20px 0;">Sin comidas registradas hoy</div>';
-  el.innerHTML=`
-    <div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:0 0 24px;">
-      <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto;"></div>
-      <div style="padding:0 16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-          <div style="font-family:'Bebas Neue';font-size:22px;letter-spacing:2px;">REGISTRO DE HOY</div>
-          <div style="text-align:right;"><div style="font-family:'Bebas Neue';font-size:26px;color:var(--accent2);">${total} kcal</div><div style="font-size:10px;color:var(--muted);">${prot}g proteína</div></div>
-        </div>
-        ${items}
-        ${logged.length?`<button onclick="clearCalLog()" style="width:100%;margin-top:12px;background:transparent;border:1px solid rgba(255,77,0,.3);color:var(--accent);border-radius:10px;padding:10px;font-size:12px;cursor:pointer;">🗑 Borrar registro de hoy</button>`:''}
-        <button onclick="document.getElementById('calLogOv').remove()" style="width:100%;margin-top:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:10px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;">Cerrar</button>
-      </div>
-    </div>`;
-  document.body.appendChild(el);
-  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
-}
-
 function clearCalLog(){
   if(!confirm('¿Borrar el registro de hoy?'))return;
   const d=db();const tk=today();
