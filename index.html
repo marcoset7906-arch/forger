@@ -88,9 +88,6 @@ select.inp{-webkit-appearance:none;}
 .wm-btn:active{border-color:var(--accent);color:var(--accent);}
 
 /* WATER */
-.water-card{margin:0 16px 10px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;}
-.glass-btn{width:34px;height:34px;border-radius:8px;border:2px solid var(--border);background:var(--bg3);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-.glass-btn.full{background:rgba(64,196,255,.15);border-color:var(--blue);}
 
 /* TODAY WORKOUT */
 .today-wk{margin:0 16px 10px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;}
@@ -272,7 +269,6 @@ select.inp{-webkit-appearance:none;}
   <div class="home-hero" id="homeHero"></div>
   <div class="stats-3" id="statsRow"></div>
   <div id="weightMini"></div>
-  <div id="waterDiv"></div>
   <div id="todayWkDiv"></div>
 </div>
 
@@ -432,7 +428,16 @@ const MEALS_WEEK={
       {t:'21:30',lbl:'Cena',icon:'🐟',name:'Cena reparadora',desc:'200g salmón o atún a la plancha + 200g patata cocida + brócoli al vapor + aceite de oliva',kcal:'~580',prot:'48g',carb:'42g'},
       {t:'23:00',lbl:'Pre-sueño',icon:'🍶',name:'Proteína nocturna',desc:'200g yogur griego natural + 1 cda miel + 15g nueces',kcal:'~220',prot:'16g',carb:'18g'},
     ]},
-  martes:{type:'training',kcalTotal:'~2550',protTotal:'155g',carbTotal:'298g',
+  martes:{type:'rest',kcalTotal:'~2080',protTotal:'142g',carbTotal:'228g',
+    meals:[
+      {t:'09:00',lbl:'Desayuno',icon:'🥣',name:'Desayuno equilibrado',desc:'80g avena con leche + 2 huevos revueltos + 1 plátano + café o té sin azúcar',kcal:'~520',prot:'28g',carb:'68g'},
+      {t:'12:00',lbl:'Media mañana',icon:'🫙',name:'Snack proteico',desc:'200g yogur griego natural + 15g nueces + 1 kiwi',kcal:'~220',prot:'16g',carb:'18g'},
+      {t:'15:00',lbl:'Comida',icon:'🐟',name:'Almuerzo de descanso',desc:'200g bacalao o merluza al horno + 100g arroz integral + ensalada variada (lechuga, tomate, zanahoria) + aceite de oliva',kcal:'~540',prot:'46g',carb:'56g'},
+      {t:'18:00',lbl:'Merienda',icon:'🍎',name:'Snack ligero',desc:'1 manzana o pera + 20g almendras + 1 infusión',kcal:'~180',prot:'4g',carb:'26g'},
+      {t:'21:00',lbl:'Cena',icon:'🥗',name:'Cena ligera activa',desc:'3 huevos en tortilla francesa + ensalada de espinacas con tomate cherry + 1 tostada integral + aceite de oliva',kcal:'~380',prot:'28g',carb:'22g'},
+      {t:'22:30',lbl:'Pre-sueño',icon:'🍶',name:'Proteína nocturna',desc:'200g yogur griego + 1 cda crema de cacahuete',kcal:'~200',prot:'18g',carb:'10g'},
+    ]},
+  miercoles:{type:'training',kcalTotal:'~2550',protTotal:'155g',carbTotal:'298g',
     meals:[
       {t:'08:30',lbl:'Pre-salida',icon:'🍊',name:'Pre-entreno ligero',desc:'1 naranja grande + 1 puñado dátiles (30g)',kcal:'~140',prot:'2g',carb:'34g'},
       {t:'10:15',lbl:'Post-entreno',icon:'🥚',name:'Desayuno post espalda',desc:'4 huevos revueltos con espinacas + 2 tostadas pan integral + 200ml leche + 1 plátano',kcal:'~680',prot:'42g',carb:'72g'},
@@ -441,15 +446,6 @@ const MEALS_WEEK={
       {t:'18:30',lbl:'Merienda',icon:'🫓',name:'Bocadillo energético',desc:'Pan integral + 80g pavo cocido + aguacate (½) + tomate + aceite de oliva',kcal:'~380',prot:'26g',carb:'36g'},
       {t:'21:30',lbl:'Cena',icon:'🥩',name:'Cena de recuperación',desc:'200g pechuga de pollo al horno con especias + 150g boniato asado + ensalada verde + 1 cda aceite oliva',kcal:'~560',prot:'48g',carb:'40g'},
       {t:'23:00',lbl:'Pre-sueño',icon:'🫙',name:'Caseína natural',desc:'250g queso fresco batido (tipo Quark) + 1 cda miel + canela',kcal:'~200',prot:'22g',carb:'14g'},
-    ]},
-  miercoles:{type:'rest',kcalTotal:'~2080',protTotal:'142g',carbTotal:'228g',
-    meals:[
-      {t:'09:00',lbl:'Desayuno',icon:'🥣',name:'Desayuno equilibrado',desc:'80g avena con leche + 2 huevos revueltos + 1 plátano + café o té sin azúcar',kcal:'~520',prot:'28g',carb:'68g'},
-      {t:'12:00',lbl:'Media mañana',icon:'🫙',name:'Snack proteico',desc:'200g yogur griego natural + 15g nueces + 1 kiwi',kcal:'~220',prot:'16g',carb:'18g'},
-      {t:'15:00',lbl:'Comida',icon:'🐟',name:'Almuerzo de descanso',desc:'200g bacalao o merluza al horno + 100g arroz integral + ensalada variada (lechuga, tomate, zanahoria) + aceite de oliva',kcal:'~540',prot:'46g',carb:'56g'},
-      {t:'18:00',lbl:'Merienda',icon:'🍎',name:'Snack ligero',desc:'1 manzana o pera + 20g almendras + 1 infusión',kcal:'~180',prot:'4g',carb:'26g'},
-      {t:'21:00',lbl:'Cena',icon:'🥗',name:'Cena ligera activa',desc:'3 huevos en tortilla francesa + ensalada de espinacas con tomate cherry + 1 tostada integral + aceite de oliva',kcal:'~380',prot:'28g',carb:'22g'},
-      {t:'22:30',lbl:'Pre-sueño',icon:'🍶',name:'Proteína nocturna',desc:'200g yogur griego + 1 cda crema de cacahuete',kcal:'~200',prot:'18g',carb:'10g'},
     ]},
   jueves:{type:'rest',kcalTotal:'~2100',protTotal:'140g',carbTotal:'232g',
     meals:[
@@ -488,45 +484,6 @@ const MEALS_WEEK={
       {t:'19:30',lbl:'Merienda',icon:'🫓',name:'Merienda dominical',desc:'Bocadillo integral con 80g jamón serrano + tomate + aceite de oliva',kcal:'~360',prot:'26g',carb:'38g'},
       {t:'22:00',lbl:'Cena',icon:'🥚',name:'Cena ligera cierre semana',desc:'Tortilla francesa de 3 huevos con espinacas + 100g arroz integral + 1 cda aceite de oliva',kcal:'~440',prot:'26g',carb:'50g'},
       {t:'23:30',lbl:'Pre-sueño',icon:'🍶',name:'Proteína nocturna',desc:'200g queso fresco batido + frutos rojos + 1 cda semillas chía',kcal:'~180',prot:'18g',carb:'12g'},
-    ]},
-  domingo:{name:'Domingo',focus:'Piernas + Core',type:'Multiestación',icon:'🦵',
-    warmup:'5 min bicicleta estática + 15 sentadillas sin peso + rotaciones de cadera.',
-    duration:'~60 min',
-    blocks:[
-      {label:'BLOQUE A · PIERNAS',color:'var(--accent)'},
-      {label:'BLOQUE B · CORE',color:'var(--green)'},
-    ],
-    exercises:[
-      {id:'s1',block:0,name:'Leg extension',sets:4,reps:'10',rt:'heavy',
-       muscles:['quads'],
-       tip:'Extensión completa arriba. Baja en 3s. 1s de pausa en extensión máxima.'},
-      {id:'s2',block:0,name:'Leg curl',sets:4,reps:'10',rt:'heavy',
-       muscles:['hamstrings'],
-       tip:'Caderas pegadas al banco. Baja en 4s. Excéntrico lento = más músculo.'},
-      {id:'s3',block:0,name:'Sentadilla',sets:4,reps:'8',rt:'heavy',
-       muscles:['quads','glutes','hamstrings'],
-       tip:'Rodillas sobre los pies. Muslos paralelos al suelo. Talones pegados siempre.'},
-      {id:'s4',block:0,name:'Gemelos en máquina',sets:4,reps:'15',rt:'medium',
-       muscles:['calves'],
-       tip:'Rango completo. Talón abajo del todo. 2s en punta máxima. Baja en 2s.'},
-      {id:'s5',block:1,name:'Crunch en máquina',sets:3,reps:'12',rt:'core',
-       muscles:['abs'],
-       tip:'Exhala al contraer. No uses cuello ni brazos. Solo abdomen.'},
-      {id:'s6',block:1,name:'Plancha',sets:3,reps:'30s',rt:'core',isTime:true,
-       muscles:['abs','obliques'],
-       tip:'Cuerpo recto. Core apretado. Respira con control.'},
-      {id:'s7',block:1,name:'Elevaciones de piernas tumbado',sets:3,reps:'12',rt:'core',
-       muscles:['abs','hip_flexors'],
-       tip:'Lumbar pegada al banco. Piernas casi rectas. Baja sin que el talón toque.'},
-      {id:'s8',block:1,name:'Plancha lateral',sets:3,reps:'25s',rt:'core',isTime:true,
-       muscles:['obliques','abs'],
-       tip:'Cada lado. Codo bajo el hombro. Caderas alineadas. No dejes caer la cadera.'},
-      {id:'s9',block:1,name:'Crunch bicicleta',sets:3,reps:'20 c/lado',rt:'core',
-       muscles:['abs','obliques'],
-       tip:'Codo al lado contrario alternando despacio y controlado.'},
-      {id:'s10',block:1,name:'Plancha con elevación de brazo',sets:3,reps:'10 c/lado',rt:'core',
-       muscles:['abs','obliques'],
-       tip:'Desde plancha, eleva el brazo al frente 2s. La cadera no gira.'},
     ]},
 
 };
@@ -570,7 +527,8 @@ const WK={
        tip:'Codo al lado contrario. Alterna lento y controlado. No tires del cuello.'},
     ]},
 
-  martes:{name:'Martes',focus:'Espalda + Hombros + Core',type:'Calistenia · Parque',icon:'💪',
+  martes:{name:'Martes',focus:'Descanso',type:'',icon:'😴',exercises:[],rest:true},
+  miercoles:{name:'Miércoles',focus:'Espalda + Hombros + Core',type:'Calistenia · Parque',icon:'💪',
     warmup:'Colgado activo 30s + rotaciones de hombro × 15 + 2×5 dominadas suaves.',
     duration:'~60 min',
     blocks:[
@@ -607,7 +565,6 @@ const WK={
        tip:'Codo al lado contrario alternando despacio. No tires del cuello.'},
     ]},
 
-  miercoles:{name:'Miércoles',focus:'Descanso',type:'',icon:'😴',exercises:[],rest:true},
   jueves:{name:'Jueves',focus:'Descanso',type:'',icon:'😴',exercises:[],rest:true},
   viernes:{name:'Viernes',focus:'Descanso',type:'',icon:'😴',exercises:[],rest:true},
 
@@ -779,6 +736,7 @@ function goPage(pg){
   if(pg==='stats')renderStats();
   if(pg==='profile')renderProfile();
   if(pg==='home')renderHome();
+  if(pg==='nutrition')renderNutrition();
 }
 
 // ════════════════════════════════════════════════════════
@@ -850,38 +808,6 @@ function renderHome(){
   setTimeout(()=>drawWChart('homeWChart'),50);
 
   // Water tracker
-  const _wData=db().water||{};
-  const _wToday=_wData[today()]||{ml:0};
-  const _wML=_wToday.ml||0;
-  const _wGoal=2500;
-  const _wPct=Math.min(100,Math.round(_wML/_wGoal*100));
-  const _wEntries=_wToday.entries||[];
-  document.getElementById('waterDiv').innerHTML=`
-    <div class="water-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div><div style="font-size:14px;font-weight:700;">💧 Hidratación diaria</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:1px;">Objetivo: ${_wGoal}ml</div></div>
-        <div style="text-align:right;">
-          <div style="font-family:'Bebas Neue';font-size:24px;color:var(--blue);line-height:1;">${_wML}<span style="font-size:12px;color:var(--muted)">ml</span></div>
-          <div style="font-size:10px;color:var(--muted);">${_wPct}% del objetivo</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:12px;">
-        <button onclick="addWater(250)" style="flex:1;background:rgba(64,196,255,.12);border:1.5px solid rgba(64,196,255,.3);color:#40C4FF;border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;">
-          <span style="font-size:20px;">🥛</span>Vaso<span style="font-size:10px;opacity:.7;">250ml</span>
-        </button>
-        <button onclick="addWater(500)" style="flex:1;background:rgba(64,196,255,.12);border:1.5px solid rgba(64,196,255,.3);color:#40C4FF;border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;">
-          <span style="font-size:20px;">🍶</span>Botella<span style="font-size:10px;opacity:.7;">500ml</span>
-        </button>
-        <button onclick="openCustomWater()" style="flex:1;background:rgba(64,196,255,.12);border:1.5px solid rgba(64,196,255,.3);color:#40C4FF;border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;">
-          <span style="font-size:20px;">✏️</span>Personalizado<span style="font-size:10px;opacity:.7;">ml</span>
-        </button>
-      </div>
-      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:${_wEntries.length?'10px':'0'};">
-        <div style="height:100%;width:${_wPct}%;background:linear-gradient(90deg,#40C4FF,#80D8FF);border-radius:3px;transition:width .4s;"></div>
-      </div>
-      ${_wEntries.length?`<div style="display:flex;flex-wrap:wrap;gap:5px;">${_wEntries.map((e,i)=>`<div style="background:rgba(64,196,255,.1);border:1px solid rgba(64,196,255,.2);border-radius:6px;padding:3px 8px;font-size:11px;color:#40C4FF;display:flex;align-items:center;gap:4px;">${e.ml}ml <span onclick="removeWaterEntry(${i})" style="cursor:pointer;opacity:.6;font-size:13px;line-height:1;">×</span></div>`).join('')}</div>`:''}
-    </div>`;
 
   // Today's workout
   const wd=WK[todayWD()];
@@ -904,53 +830,6 @@ function renderHome(){
     </div>`;
 }
 
-function addWater(ml){
-  const d=db();if(!d.water)d.water={};
-  const tk=today();
-  if(!d.water[tk])d.water[tk]={ml:0,entries:[]};
-  d.water[tk].ml=(d.water[tk].ml||0)+ml;
-  if(!d.water[tk].entries)d.water[tk].entries=[];
-  d.water[tk].entries.push({ml});
-  save(d);renderHome();showToast('💧 +'+ml+'ml · Total: '+d.water[tk].ml+'ml');
-}
-
-function removeWaterEntry(idx){
-  const d=db();if(!d.water)return;
-  const tk=today();if(!d.water[tk])return;
-  const entries=d.water[tk].entries||[];
-  if(entries[idx]){d.water[tk].ml=Math.max(0,(d.water[tk].ml||0)-entries[idx].ml);entries.splice(idx,1);}
-  d.water[tk].entries=entries;save(d);renderHome();
-}
-
-function openCustomWater(){
-  const el=document.createElement('div');
-  el.id='customWaterOv';
-  el.style.cssText='position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:20px;';
-  el.innerHTML=`<div style="background:var(--bg2);border-radius:18px;padding:24px;width:100%;max-width:320px;">
-    <div style="font-family:'Bebas Neue';font-size:22px;letter-spacing:2px;margin-bottom:6px;">CANTIDAD PERSONALIZADA</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Introduce los ml que has bebido</div>
-    <input id="customWaterInp" type="number" placeholder="Ej: 330" min="1" max="2000"
-      style="width:100%;background:var(--bg3);border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:13px;font-size:18px;text-align:center;box-sizing:border-box;margin-bottom:12px;">
-    <div style="display:flex;gap:8px;">
-      <button onclick="document.getElementById('customWaterOv').remove()" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:12px;font-size:13px;cursor:pointer;">Cancelar</button>
-      <button onclick="_confirmCustomWater()" style="flex:1;background:#40C4FF;color:#000;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;">💧 Añadir</button>
-    </div>
-  </div>`;
-  document.body.appendChild(el);
-  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
-  setTimeout(()=>document.getElementById('customWaterInp')?.focus(),200);
-}
-
-function _confirmCustomWater(){
-  const ml=+document.getElementById('customWaterInp')?.value;
-  if(!ml||ml<1){showToast('Introduce una cantidad válida');return;}
-  document.getElementById('customWaterOv')?.remove();
-  addWater(ml);
-}
-
-// ════════════════════════════════════════════════════════
-// WEIGHT MODAL
-// ════════════════════════════════════════════════════════
 function openWModal(){
   const d=db();const curW=(d.weights||{})[today()]||'';
   document.getElementById('wInp').value=curW;
@@ -1448,7 +1327,7 @@ function renderNutrition(){
   if(!nutSelDay) nutSelDay=todayWD();
   const body=document.getElementById('nutritionBody');
   const dayLabels={lunes:'LUN',martes:'MAR',miercoles:'MIÉ',jueves:'JUE',viernes:'VIE',sabado:'SÁB',domingo:'DOM'};
-  const dayIcons={lunes:'🤸',martes:'💪',miercoles:'😴',jueves:'😴',viernes:'😴',sabado:'🦵',domingo:'🏋️'};
+  const dayIcons={lunes:'🤸',martes:'😴',miercoles:'💪',jueves:'😴',viernes:'😴',sabado:'🏋️',domingo:'🦵'};
 
   // Tab strip
   let tabsHtml=`<div style="display:flex;overflow-x:auto;gap:7px;padding:14px 16px 0;scrollbar-width:none;">`;
