@@ -888,23 +888,60 @@ function renderWorkout(day){
     html += `<div class="slbl" style="padding-top:14px;"><span style="color:${blk.color}">${blk.label}</span></div>`;
     wk.exercises.filter(e=>e.block===bi).forEach(ex => {
       const isDone = done.includes(ex.id);
-      const prevLog = (STATE[day]?.logs||{})[ex.id];
-      const prevSets = (STATE.history||{})[ex.id]?.slice(-3)||[];
-      const lastVal = prevSets.length ? prevSets[prevSets.length-1] : null;
+      const savedSets = (STATE[day]?.sets||{})[ex.id] || [];
+      const isTime = ex.isTime;
+
+      // Build sets rows
+      let setsHtml = `<div style="padding:0 16px 12px;">
+        <div style="display:grid;grid-template-columns:28px 1fr${isTime?'':' 1fr'} 44px;gap:6px;align-items:center;margin-bottom:6px;">
+          <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;text-align:center;">S</div>
+          ${isTime
+            ? `<div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;text-align:center;">Tiempo (s)</div>`
+            : `<div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;text-align:center;">Reps</div>
+               <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;text-align:center;">Kg</div>`
+          }
+          <div></div>
+        </div>`;
+
+      for(let s=0; s<ex.sets; s++){
+        const sv = savedSets[s] || {};
+        const setDone = sv.done || false;
+        setsHtml += `<div id="setrow_${ex.id}_${s}" style="display:grid;grid-template-columns:28px 1fr${isTime?'':' 1fr'} 44px;gap:6px;align-items:center;margin-bottom:6px;">
+          <div style="width:26px;height:26px;border-radius:50%;background:${setDone?'var(--green)':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${setDone?'#000':'var(--muted)'};">${s+1}</div>
+          ${isTime
+            ? `<input type="number" inputmode="numeric" placeholder="${ex.reps.replace('s','')}"
+                style="height:36px;background:var(--bg3);border:1.5px solid ${setDone?'var(--green)':'var(--border)'};border-radius:8px;color:var(--text);font-size:15px;font-weight:700;text-align:center;outline:none;width:100%;"
+                value="${sv.time||''}"
+                onchange="saveSetVal('${day}','${ex.id}',${s},'time',this.value)">`
+            : `<input type="number" inputmode="numeric" placeholder="${isNaN(parseInt(ex.reps))?'—':parseInt(ex.reps)}"
+                style="height:36px;background:var(--bg3);border:1.5px solid ${setDone?'var(--green)':'var(--border)'};border-radius:8px;color:var(--text);font-size:15px;font-weight:700;text-align:center;outline:none;width:100%;"
+                value="${sv.reps||''}"
+                onchange="saveSetVal('${day}','${ex.id}',${s},'reps',this.value)">
+               <input type="number" inputmode="decimal" placeholder="kg"
+                style="height:36px;background:var(--bg3);border:1.5px solid ${setDone?'var(--green)':'var(--border)'};border-radius:8px;color:var(--text);font-size:15px;font-weight:700;text-align:center;outline:none;width:100%;"
+                value="${sv.kg||''}"
+                onchange="saveSetVal('${day}','${ex.id}',${s},'kg',this.value)">`
+          }
+          <button onclick="toggleSetDone('${day}','${ex.id}',${s})" style="height:36px;width:44px;border-radius:8px;border:1.5px solid ${setDone?'var(--green)':'var(--border)'};background:${setDone?'rgba(0,230,118,.12)':'var(--bg3)'};color:${setDone?'var(--green)':'var(--muted)'};font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+            ${setDone?'✓':'○'}
+          </button>
+        </div>`;
+      }
+      setsHtml += `</div>`;
 
       html += `<div class="ex-card${isDone?' done':''}" id="excard_${ex.id}">
         <div class="ex-head">
           <div>
             <div class="ex-name" onclick="showMuscle('${ex.id}')" style="cursor:pointer">${ex.name} <span style="font-size:11px;color:var(--muted)">💪</span></div>
-            <div class="ex-meta">${ex.sets}×${ex.reps} · <span class="pill pill-${ex.rt==='heavy'?'h':ex.rt==='medium'?'m':'c'}">${ex.rt}</span></div>
+            <div class="ex-meta">${ex.sets} series · ${ex.reps} · <span class="pill pill-${ex.rt==='heavy'?'h':ex.rt==='medium'?'m':'c'}">${ex.rt}</span></div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
             ${isDone ? `<span style="color:var(--green);font-size:18px;">✓</span>` : `<button onclick="markDone('${day}','${ex.id}')" style="background:var(--accent);border:none;border-radius:8px;color:#000;padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;">✓ Hecho</button>`}
-            ${lastVal ? `<span class="ex-trend trend-${lastVal>=0?'up':'dn'}" style="font-size:10px;">${lastVal>0?'↑':lastVal<0?'↓':'='} ${Math.abs(lastVal)}kg</span>` : ''}
           </div>
         </div>
         ${ex.tip ? `<div class="ex-tip">💡 ${ex.tip}</div>` : ''}
-        <div class="rest-row">
+        ${setsHtml}
+        <div class="rest-row" style="padding-top:0;">
           <button class="rest-btn" onclick="startTimer(${REST_SECS[ex.rt]||60},'${ex.name}')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             Descanso ${REST_SECS[ex.rt]||60}s
@@ -917,8 +954,51 @@ function renderWorkout(day){
   body.innerHTML = html;
 }
 
+function saveSetVal(day, exId, setIdx, field, value){
+  if(!STATE[day]) STATE[day] = {done:[], sets:{}};
+  if(!STATE[day].sets) STATE[day].sets = {};
+  if(!STATE[day].sets[exId]) STATE[day].sets[exId] = [];
+  if(!STATE[day].sets[exId][setIdx]) STATE[day].sets[exId][setIdx] = {};
+  STATE[day].sets[exId][setIdx][field] = value;
+  saveState();
+}
+
+function toggleSetDone(day, exId, setIdx){
+  if(!STATE[day]) STATE[day] = {done:[], sets:{}};
+  if(!STATE[day].sets) STATE[day].sets = {};
+  if(!STATE[day].sets[exId]) STATE[day].sets[exId] = [];
+  if(!STATE[day].sets[exId][setIdx]) STATE[day].sets[exId][setIdx] = {};
+  const cur = STATE[day].sets[exId][setIdx].done || false;
+  STATE[day].sets[exId][setIdx].done = !cur;
+  saveState();
+
+  // Update UI without full re-render
+  const row = document.getElementById(`setrow_${exId}_${setIdx}`);
+  if(!row) return;
+  const isDone = !cur;
+  const circle = row.children[0];
+  const btn = row.lastElementChild;
+  circle.style.background = isDone ? 'var(--green)' : 'var(--border)';
+  circle.style.color = isDone ? '#000' : 'var(--muted)';
+  btn.style.borderColor = isDone ? 'var(--green)' : 'var(--border)';
+  btn.style.background = isDone ? 'rgba(0,230,118,.12)' : 'var(--bg3)';
+  btn.style.color = isDone ? 'var(--green)' : 'var(--muted)';
+  btn.textContent = isDone ? '✓' : '○';
+  // Update inputs border color
+  Array.from(row.querySelectorAll('input')).forEach(inp => {
+    inp.style.borderColor = isDone ? 'var(--green)' : 'var(--border)';
+  });
+
+  // Auto-start rest timer when set done
+  if(isDone){
+    const wk = WK[day];
+    const ex = wk?.exercises?.find(e=>e.id===exId);
+    if(ex) startTimer(REST_SECS[ex.rt]||60, ex.name);
+  }
+}
+
 function markDone(day, exId){
-  if(!STATE[day]) STATE[day] = {done:[], logs:{}};
+  if(!STATE[day]) STATE[day] = {done:[], sets:{}};
   if(!STATE[day].done.includes(exId)){
     STATE[day].done.push(exId);
     checkStreak(day);
