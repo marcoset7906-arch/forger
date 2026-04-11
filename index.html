@@ -646,3 +646,646 @@ const WK={
        tip:'Cuerpo recto de cabeza a talones. Core apretado. Respira con control.'},
     ]}
 };
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let U = JSON.parse(localStorage.getItem('forge_user') || 'null');
+let STATE = JSON.parse(localStorage.getItem('forge_state') || '{}');
+const todayKey = () => DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+function saveState(){localStorage.setItem('forge_state', JSON.stringify(STATE));}
+function saveUser(){localStorage.setItem('forge_user', JSON.stringify(U));}
+
+// ════════════════════════════════════════════════════════
+// SETUP / ONBOARDING
+// ════════════════════════════════════════════════════════
+const SETUP_STEPS = [
+  {id:'name', title:'¿Cómo te llamas?', sub:'Solo tu nombre, sin presión.', fields:[
+    {id:'name', label:'Nombre', type:'text', placeholder:'Tu nombre'}
+  ]},
+  {id:'body', title:'Tu cuerpo hoy', sub:'Datos para calcular tu IMC y seguir tu progreso.', fields:[
+    {id:'age', label:'Edad', type:'number', placeholder:'25', unit:'años'},
+    {id:'height', label:'Altura', type:'number', placeholder:'175', unit:'cm'},
+    {id:'weight', label:'Peso', type:'number', placeholder:'70', unit:'kg'}
+  ]},
+  {id:'goal', title:'Tu objetivo', sub:'Elige tu meta principal ahora mismo.', fields:[
+    {id:'goal', label:'Objetivo', type:'select', options:['Ganar masa muscular','Perder grasa','Mantener y mejorar fuerza','Mejorar condición física']}
+  ]}
+];
+
+function setupInit(){
+  if(U){showApp(); return;}
+  const steps = document.getElementById('setupSteps');
+  const content = document.getElementById('setupContent');
+  let step = 0;
+  let data = {};
+
+  function render(){
+    const s = SETUP_STEPS[step];
+    steps.innerHTML = SETUP_STEPS.map((_,i)=>`<div class="setup-step${i<=step?' done':''}"></div>`).join('');
+    let fieldsHtml = s.fields.map(f => {
+      if(f.type === 'select'){
+        return `<div class="inp-group" style="margin-bottom:14px;"><label>${f.label}</label>
+          <select class="inp" id="sf_${f.id}">${f.options.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+      }
+      return `<div class="inp-group" style="margin-bottom:14px;"><label>${f.label}${f.unit?` (${f.unit})`:''}</label>
+        <input class="inp" type="${f.type}" id="sf_${f.id}" placeholder="${f.placeholder}"></div>`;
+    }).join('');
+    content.innerHTML = `
+      <div class="setup-title">${s.title}</div>
+      <div class="setup-sub">${s.sub}</div>
+      ${fieldsHtml}
+      <button class="btn-primary" onclick="setupNext()">${step < SETUP_STEPS.length-1 ? 'Continuar →' : '¡Empezar! 🔥'}</button>
+      ${step>0?`<div style="height:8px"></div><button class="btn-ghost" onclick="setupBack()">← Atrás</button>`:''}
+    `;
+  }
+
+  window.setupNext = function(){
+    const s = SETUP_STEPS[step];
+    for(const f of s.fields){
+      const el = document.getElementById('sf_'+f.id);
+      if(!el || !el.value.trim()){toast('Completa todos los campos'); return;}
+      data[f.id] = f.type==='number' ? parseFloat(el.value) : el.value;
+    }
+    if(step < SETUP_STEPS.length-1){ step++; render(); }
+    else {
+      U = {name: data.name, age: data.age, height: data.height, weight: data.weight, goal: data.goal,
+        joined: new Date().toISOString(), streak:0, lastWorkout:null};
+      STATE.weights = [{date: new Date().toISOString().split('T')[0], kg: data.weight}];
+      saveUser(); saveState();
+      showApp();
+    }
+  };
+  window.setupBack = function(){ if(step>0){step--; render();} };
+  render();
+}
+
+function showApp(){
+  document.getElementById('setupOv').classList.add('hidden');
+  document.getElementById('mainHdr').style.display='';
+  document.getElementById('mainNav').style.display='';
+  document.querySelectorAll('.page').forEach(p=>p.style.display='');
+  updateHeader();
+  goPage('home');
+}
+
+// ════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════
+function goPage(pg){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.bn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('page-'+pg).classList.add('on');
+  document.querySelector(`.bn[data-pg="${pg}"]`)?.classList.add('on');
+  if(pg==='home') renderHome();
+  else if(pg==='workout') renderWorkout();
+  else if(pg==='stats') renderStats();
+  else if(pg==='nutrition') renderNutrition();
+  else if(pg==='profile') renderProfile();
+}
+
+// ════════════════════════════════════════════════════════
+// HEADER
+// ════════════════════════════════════════════════════════
+function updateHeader(){
+  if(!U) return;
+  const bmi = U.weight && U.height ? (U.weight / ((U.height/100)**2)).toFixed(1) : '—';
+  document.getElementById('hdrBmi').textContent = `IMC ${bmi}`;
+  document.getElementById('hdrStreak').textContent = `🔥 ${U.streak||0}`;
+}
+
+// ════════════════════════════════════════════════════════
+// HOME
+// ════════════════════════════════════════════════════════
+function renderHome(){
+  if(!U) return;
+  const today = todayKey();
+  const wk = WK[today];
+  const bmi = U.weight && U.height ? (U.weight / ((U.height/100)**2)).toFixed(1) : '—';
+  const bmiCat = bmi<18.5?'Bajo peso':bmi<25?'Normal':bmi<30?'Sobrepeso':'Obesidad';
+  const quote = QUOTES[new Date().getDay() % QUOTES.length];
+  const dayN = new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+
+  document.getElementById('homeHero').innerHTML = `
+    <div style="font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">${dayN}</div>
+    <div style="font-family:'Bebas Neue';font-size:22px;letter-spacing:2px;margin-bottom:8px;">${wk.icon} ${wk.name} · ${wk.focus||'Descanso'}</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.6;font-style:italic;">"${quote}"</div>
+  `;
+
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-box"><div class="stat-val" style="color:var(--accent)">${U.weight||'—'}</div><div class="stat-lbl">kg</div></div>
+    <div class="stat-box"><div class="stat-val" style="color:var(--accent2)">${bmi}</div><div class="stat-lbl">${bmiCat}</div></div>
+    <div class="stat-box"><div class="stat-val" style="color:var(--green)">${U.streak||0}</div><div class="stat-lbl">Racha días</div></div>
+  `;
+
+  // Weight mini
+  const weights = (STATE.weights||[]);
+  const lastW = weights.length > 1 ? weights[weights.length-2].kg : null;
+  const curW = weights.length ? weights[weights.length-1].kg : U.weight;
+  const diff = lastW ? (curW - lastW).toFixed(1) : null;
+  const diffClass = !diff ? 'neu' : diff > 0 ? 'up' : 'down';
+  const diffLabel = !diff ? 'Sin cambio' : (diff>0?'+':'')+diff+'kg vs anterior';
+  document.getElementById('weightMini').innerHTML = `
+    <div class="weight-mini">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;">Peso actual</div>
+        <span class="wchange ${diffClass}">${diffLabel}</span>
+      </div>
+      <div style="font-family:'Bebas Neue';font-size:42px;line-height:1;color:var(--text)">${curW} <span style="font-size:18px;color:var(--muted)">kg</span></div>
+      <div class="wm-actions">
+        <button class="wm-btn" onclick="openModal('wOv')">+ Registrar peso</button>
+        <button class="wm-btn" onclick="openModal('ormOv')">Calc 1RM</button>
+      </div>
+    </div>
+  `;
+
+  // Today workout teaser
+  const todayDiv = document.getElementById('todayWkDiv');
+  if(wk.rest){
+    todayDiv.innerHTML = `<div class="today-wk" style="text-align:center;padding:20px;"><div style="font-size:32px">😴</div><div style="font-family:'Bebas Neue';font-size:20px;margin-top:6px;">Día de Descanso</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Recupera. Mañana más fuerte.</div></div>`;
+  } else {
+    const done = (STATE[today]?.done||[]).length;
+    const total = wk.exercises.length;
+    const pct = total ? Math.round(done/total*100) : 0;
+    todayDiv.innerHTML = `
+      <div class="today-wk" onclick="goPage('workout')">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="font-weight:700;font-size:15px;">Entreno de hoy ${wk.icon}</div>
+          <span class="pill pill-h">${wk.duration}</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${wk.type} · ${wk.focus}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px;">
+          <span>${done}/${total} ejercicios</span><span>${pct}%</span>
+        </div>
+        <div style="height:4px;background:var(--border);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s;"></div>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--muted);">🔥 Calentamiento: ${wk.warmup}</div>
+      </div>
+    `;
+  }
+
+  // Tip del día
+  const tip = TIPS[new Date().getDate() % TIPS.length];
+  const tipDiv = document.createElement('div');
+  tipDiv.style.cssText='margin:0 16px 10px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px;';
+  tipDiv.innerHTML = `<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--accent2);text-transform:uppercase;margin-bottom:4px;">💡 Tip del día</div><div style="font-size:13px;color:var(--text2);line-height:1.55;">${tip}</div>`;
+  document.getElementById('todayWkDiv').after(tipDiv);
+}
+
+// ════════════════════════════════════════════════════════
+// WORKOUT
+// ════════════════════════════════════════════════════════
+let currentDay = null;
+function renderWorkout(day){
+  if(!day) day = todayKey();
+  currentDay = day;
+  const strip = document.getElementById('dayStrip');
+  strip.innerHTML = DAYS.map(d => {
+    const w = WK[d];
+    return `<div class="dchip${d===day?' on':''}${w.rest?' rest-day':''}" onclick="renderWorkout('${d}')">
+      <b>${SHORT[d]}</b>${w.icon}
+    </div>`;
+  }).join('');
+
+  const wk = WK[day];
+  const body = document.getElementById('workoutBody');
+  if(wk.rest){
+    body.innerHTML = `<div class="rest-view"><div style="font-size:64px">😴</div><div style="font-family:'Bebas Neue';font-size:28px;letter-spacing:3px;margin:12px 0 6px;">Día de Descanso</div><div style="font-size:14px;color:var(--muted);">Deja que el músculo crezca. Hidrátate, duerme y come bien.</div></div>`;
+    document.getElementById('pbarFill').style.width='0%';
+    return;
+  }
+
+  const stateDay = STATE[day] || {};
+  const done = stateDay.done || [];
+  const total = wk.exercises.length;
+  const pct = total ? Math.round(done.length/total*100) : 0;
+  document.getElementById('pbarFill').style.width = pct+'%';
+
+  // Hero
+  let html = `<div class="ex-hero">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div style="font-family:'Bebas Neue';font-size:22px;letter-spacing:2px;">${wk.icon} ${wk.focus}</div>
+      <span class="pill pill-h">${wk.duration}</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">${wk.type}</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.55;">🔥 ${wk.warmup}</div>
+    <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+      <div style="font-size:12px;color:var(--text2);">${done.length}/${total} completados</div>
+      <div style="flex:1;height:3px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;"></div></div>
+      <div style="font-size:12px;color:var(--text2);">${pct}%</div>
+    </div>
+  </div>`;
+
+  // Done banner
+  html += `<div class="done-banner${pct===100?' show':''}" id="doneBanner">
+    <div style="font-size:32px;">🏆</div>
+    <div style="font-family:'Bebas Neue';font-size:20px;letter-spacing:2px;margin:4px 0;">¡Entreno completado!</div>
+    <div style="font-size:12px;color:rgba(0,230,118,.8);">Bien hecho. Descansa y come bien.</div>
+  </div>`;
+
+  // Exercises by block
+  wk.blocks.forEach((blk, bi) => {
+    html += `<div class="slbl" style="padding-top:14px;"><span style="color:${blk.color}">${blk.label}</span></div>`;
+    wk.exercises.filter(e=>e.block===bi).forEach(ex => {
+      const isDone = done.includes(ex.id);
+      const prevLog = (STATE[day]?.logs||{})[ex.id];
+      const prevSets = (STATE.history||{})[ex.id]?.slice(-3)||[];
+      const lastVal = prevSets.length ? prevSets[prevSets.length-1] : null;
+
+      html += `<div class="ex-card${isDone?' done':''}" id="excard_${ex.id}">
+        <div class="ex-head">
+          <div>
+            <div class="ex-name" onclick="showMuscle('${ex.id}')" style="cursor:pointer">${ex.name} <span style="font-size:11px;color:var(--muted)">💪</span></div>
+            <div class="ex-meta">${ex.sets}×${ex.reps} · <span class="pill pill-${ex.rt==='heavy'?'h':ex.rt==='medium'?'m':'c'}">${ex.rt}</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+            ${isDone ? `<span style="color:var(--green);font-size:18px;">✓</span>` : `<button onclick="markDone('${day}','${ex.id}')" style="background:var(--accent);border:none;border-radius:8px;color:#000;padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;">✓ Hecho</button>`}
+            ${lastVal ? `<span class="ex-trend trend-${lastVal>=0?'up':'dn'}" style="font-size:10px;">${lastVal>0?'↑':lastVal<0?'↓':'='} ${Math.abs(lastVal)}kg</span>` : ''}
+          </div>
+        </div>
+        ${ex.tip ? `<div class="ex-tip">💡 ${ex.tip}</div>` : ''}
+        <div class="rest-row">
+          <button class="rest-btn" onclick="startTimer(${REST_SECS[ex.rt]||60},'${ex.name}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Descanso ${REST_SECS[ex.rt]||60}s
+          </button>
+        </div>
+      </div>`;
+    });
+  });
+
+  body.innerHTML = html;
+}
+
+function markDone(day, exId){
+  if(!STATE[day]) STATE[day] = {done:[], logs:{}};
+  if(!STATE[day].done.includes(exId)){
+    STATE[day].done.push(exId);
+    checkStreak(day);
+    saveState();
+    renderWorkout(day);
+    toast('¡Ejercicio completado! 💪');
+  }
+}
+
+function checkStreak(day){
+  const today = todayKey();
+  if(day !== today) return;
+  const wk = WK[today];
+  if(wk.rest) return;
+  const done = STATE[today]?.done||[];
+  if(done.length >= wk.exercises.length){
+    const lastWO = U.lastWorkout;
+    const todayStr = new Date().toISOString().split('T')[0];
+    if(lastWO !== todayStr){
+      const yest = new Date(); yest.setDate(yest.getDate()-1);
+      const yestStr = yest.toISOString().split('T')[0];
+      U.streak = (lastWO === yestStr ? (U.streak||0)+1 : 1);
+      U.lastWorkout = todayStr;
+      saveUser(); updateHeader();
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// STATS
+// ════════════════════════════════════════════════════════
+function renderStats(){
+  const weights = STATE.weights || [];
+  const bmi = U.weight && U.height ? (U.weight / ((U.height/100)**2)).toFixed(1) : '—';
+  const bmiPct = Math.min(100, Math.max(0, ((parseFloat(bmi)-15)/25)*100));
+  const bmiColor = bmi<18.5?'var(--blue)':bmi<25?'var(--green)':bmi<30?'var(--accent2)':'var(--accent)';
+
+  let totalWOs = 0;
+  DAYS.forEach(d => { if(STATE[d]?.done?.length) totalWOs++; });
+
+  let html = `
+    <div style="height:12px"></div>
+    <div class="slbl">Resumen semanal</div>
+    <div class="stat-4">
+      <div class="s4-card"><div class="s4-val" style="color:var(--accent)">${U.streak||0}</div><div class="s4-lbl">Racha días</div></div>
+      <div class="s4-card"><div class="s4-val" style="color:var(--green)">${totalWOs}</div><div class="s4-lbl">Sesiones</div></div>
+      <div class="s4-card"><div class="s4-val" style="color:var(--accent2)">${U.weight||'—'}</div><div class="s4-lbl">Peso kg</div></div>
+      <div class="s4-card"><div class="s4-val" style="color:var(--blue)">${bmi}</div><div class="s4-lbl">IMC</div></div>
+    </div>
+
+    <div class="slbl">Índice de Masa Corporal</div>
+    <div class="chart-card">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:6px;">
+        <span>Bajo</span><span>Normal</span><span>Sobrepeso</span><span>Obesidad</span>
+      </div>
+      <div class="bmi-bar-wrap"><div class="bmi-bar" style="width:${bmiPct}%;background:${bmiColor}"></div></div>
+      <div style="text-align:center;font-family:'Bebas Neue';font-size:36px;color:${bmiColor};margin-top:8px;">${bmi}</div>
+    </div>
+
+    <div class="slbl">Historial de peso</div>
+    <div class="chart-card" style="padding:0;">
+  `;
+
+  if(weights.length < 2){
+    html += `<div style="padding:20px;text-align:center;font-size:13px;color:var(--muted);">Registra más pesos para ver tu evolución.</div>`;
+  } else {
+    weights.slice(-10).forEach((w,i,arr) => {
+      const prev = i>0 ? arr[i-1].kg : null;
+      const diff = prev ? (w.kg - prev).toFixed(1) : null;
+      const diffClass = !diff ? '' : diff>0 ? 'up' : 'down';
+      html += `<div class="wlog-row">
+        <span class="wlog-date">${w.date}</span>
+        <span class="wlog-kg">${w.kg} kg</span>
+        ${diff ? `<span class="wlog-diff ${diffClass}" style="background:${diff>0?'rgba(0,230,118,.12)':'rgba(255,77,0,.12)'};color:${diff>0?'var(--green)':'var(--accent)'}">${diff>0?'+':''}${diff}kg</span>` : ''}
+      </div>`;
+    });
+  }
+  html += `</div>`;
+
+  // Progress by exercise
+  html += `<div class="slbl" style="padding-top:14px;">Progreso por ejercicio</div><div style="margin:0 16px 80px;">`;
+  DAYS.forEach(d => {
+    const wk = WK[d];
+    if(wk.rest) return;
+    wk.exercises.forEach(ex => {
+      const done = STATE[d]?.done?.includes(ex.id);
+      html += `<div class="prog-item">
+        <div class="pi-name">${ex.name}<br><span style="font-size:10px;color:var(--muted)">${SHORT[d]}</span></div>
+        <div class="pi-val" style="color:${done?'var(--green)':'var(--muted)'}">${done?'✓':'–'}</div>
+      </div>`;
+    });
+  });
+  html += `</div>`;
+
+  document.getElementById('statsBody').innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════
+// NUTRITION
+// ════════════════════════════════════════════════════════
+function renderNutrition(day){
+  if(!day) day = todayKey();
+  const meals = MEALS_WEEK[day];
+  const tabs = DAYS.map(d => `<div onclick="renderNutrition('${d}')" style="flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.5px;${d===day?'background:var(--accent);color:#000;':'background:var(--bg3);color:var(--muted);'}">${SHORT[d]}</div>`).join('');
+
+  let html = `
+    <div style="height:12px"></div>
+    <div style="display:flex;overflow-x:auto;gap:8px;padding:0 16px 14px;scrollbar-width:none;">${tabs}</div>
+    <div style="margin:0 16px 10px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:13px 16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-family:'Bebas Neue';font-size:20px;letter-spacing:2px;">${meals.kcalTotal} kcal</div>
+        <span class="pill ${meals.type==='training'?'pill-h':'pill-c'}">${meals.type==='training'?'Día entreno':'Descanso'}</span>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:6px;font-size:11px;color:var(--muted);">
+        <span>🥩 Prot: <b style="color:var(--green)">${meals.protTotal}</b></span>
+        <span>🍚 Carb: <b style="color:var(--blue)">${meals.carbTotal}</b></span>
+      </div>
+    </div>
+  `;
+
+  meals.meals.forEach(m => {
+    html += `<div class="meal-card">
+      <div class="meal-time-col">
+        <div class="meal-hr">${m.t.replace(':','<span style="font-size:13px;">:</span>')}</div>
+        <div class="meal-lbl-sm">${m.lbl}</div>
+      </div>
+      <div class="meal-vline"></div>
+      <div class="meal-body">
+        <div class="meal-name">${m.icon} ${m.name}</div>
+        <div class="meal-desc">${m.desc}</div>
+        <div class="meal-chips">
+          <span class="mchip kc">${m.kcal}</span>
+          <span class="mchip pr">P: ${m.prot}</span>
+          <span class="mchip ch">C: ${m.carb}</span>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('nutritionBody').innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════
+// PROFILE
+// ════════════════════════════════════════════════════════
+function renderProfile(){
+  if(!U) return;
+  const bmi = U.weight && U.height ? (U.weight / ((U.height/100)**2)).toFixed(1) : '—';
+  const initials = (U.name||'?').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+
+  document.getElementById('profileBody').innerHTML = `
+    <div class="prof-avatar">
+      <div class="pa-circle">${initials}</div>
+      <div style="font-family:'Bebas Neue';font-size:22px;letter-spacing:2px;">${U.name}</div>
+      <div style="font-size:12px;color:var(--muted);">🎯 ${U.goal}</div>
+    </div>
+    <div class="body-stats-4">
+      <div class="bs-box"><div class="bs-val" style="color:var(--accent)">${U.age||'—'}</div><div class="bs-lbl">Edad</div></div>
+      <div class="bs-box"><div class="bs-val" style="color:var(--accent2)">${U.height||'—'}</div><div class="bs-lbl">cm</div></div>
+      <div class="bs-box"><div class="bs-val" style="color:var(--green)">${U.weight||'—'}</div><div class="bs-lbl">kg</div></div>
+      <div class="bs-box"><div class="bs-val" style="color:var(--blue)">${bmi}</div><div class="bs-lbl">IMC</div></div>
+    </div>
+    <div style="margin:0 16px 10px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;">
+      <div class="setting-row" onclick="openModal('editOv')">
+        <div class="sr-left"><div class="sr-ico" style="background:rgba(255,77,0,.1);">✏️</div><div><div class="sr-title">Editar perfil</div><div class="sr-sub">Nombre, peso, altura</div></div></div>
+        <span style="color:var(--muted)">›</span>
+      </div>
+      <div class="setting-row" onclick="openModal('ormOv')">
+        <div class="sr-left"><div class="sr-ico" style="background:rgba(255,184,0,.1);">🏋️</div><div><div class="sr-title">Calculadora 1RM</div><div class="sr-sub">Máximo teórico por ejercicio</div></div></div>
+        <span style="color:var(--muted)">›</span>
+      </div>
+      <div class="setting-row" onclick="confirmReset()">
+        <div class="sr-left"><div class="sr-ico" style="background:rgba(255,77,0,.1);">🔄</div><div><div class="sr-title">Reiniciar app</div><div class="sr-sub">Borrar todos los datos</div></div></div>
+        <span style="color:var(--muted)">›</span>
+      </div>
+    </div>
+  `;
+
+  // Edit modal
+  document.getElementById('editBody').innerHTML = `
+    <div class="inp-group" style="margin-bottom:12px;"><label>Nombre</label><input class="inp" id="ep_name" value="${U.name||''}"></div>
+    <div class="inp-row">
+      <div class="inp-group"><label>Edad</label><input class="inp" type="number" id="ep_age" value="${U.age||''}"></div>
+      <div class="inp-group"><label>Altura cm</label><input class="inp" type="number" id="ep_height" value="${U.height||''}"></div>
+    </div>
+    <div class="inp-group" style="margin-bottom:12px;"><label>Peso kg</label><input class="inp" type="number" id="ep_weight" step="0.1" value="${U.weight||''}"></div>
+    <button class="btn-primary" onclick="saveProfile()">Guardar</button>
+    <div style="height:8px"></div>
+    <button class="btn-ghost" onclick="closeModal('editOv')">Cancelar</button>
+  `;
+}
+
+function saveProfile(){
+  U.name = document.getElementById('ep_name').value || U.name;
+  U.age = parseFloat(document.getElementById('ep_age').value) || U.age;
+  U.height = parseFloat(document.getElementById('ep_height').value) || U.height;
+  const newW = parseFloat(document.getElementById('ep_weight').value);
+  if(newW && newW !== U.weight){
+    U.weight = newW;
+    if(!STATE.weights) STATE.weights=[];
+    STATE.weights.push({date: new Date().toISOString().split('T')[0], kg: newW});
+    saveState();
+  }
+  saveUser(); updateHeader(); closeModal('editOv'); renderProfile();
+  toast('Perfil actualizado ✓');
+}
+
+function confirmReset(){
+  if(confirm('¿Borrar todos los datos y reiniciar la app?')){
+    localStorage.clear(); location.reload();
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// WEIGHT MODAL
+// ════════════════════════════════════════════════════════
+function updateWFeedback(val){
+  const v = parseFloat(val);
+  if(!v || !U) return;
+  const prev = U.weight;
+  const diff = (v - prev).toFixed(1);
+  const el = document.getElementById('wFeedback');
+  if(!el) return;
+  el.innerHTML = diff > 0
+    ? `<span style="color:var(--accent2)">+${diff}kg vs anterior (${prev}kg)</span>`
+    : diff < 0
+    ? `<span style="color:var(--green)">${diff}kg vs anterior (${prev}kg) 📉</span>`
+    : `<span style="color:var(--muted)">Sin cambio vs anterior (${prev}kg)</span>`;
+}
+
+function saveWeight(){
+  const v = parseFloat(document.getElementById('wInp').value);
+  if(!v || v<30 || v>300){ toast('Peso inválido'); return; }
+  U.weight = v;
+  if(!STATE.weights) STATE.weights = [];
+  const today = new Date().toISOString().split('T')[0];
+  const last = STATE.weights[STATE.weights.length-1];
+  if(last && last.date === today) last.kg = v;
+  else STATE.weights.push({date: today, kg: v});
+  saveUser(); saveState(); updateHeader(); closeModal('wOv');
+  toast('Peso guardado ✓');
+}
+
+// ════════════════════════════════════════════════════════
+// 1RM CALC
+// ════════════════════════════════════════════════════════
+function calcOrm(){
+  const w = parseFloat(document.getElementById('ormW').value);
+  const r = parseInt(document.getElementById('ormR').value);
+  if(!w || !r) return;
+  const orm = (w * (1 + r/30)).toFixed(1);
+  document.getElementById('ormRes').textContent = orm + ' kg';
+  document.getElementById('ormNote').innerHTML = `
+    <div>60% → ${(orm*0.6).toFixed(0)}kg &nbsp; 70% → ${(orm*0.7).toFixed(0)}kg</div>
+    <div>80% → ${(orm*0.8).toFixed(0)}kg &nbsp; 90% → ${(orm*0.9).toFixed(0)}kg</div>
+    <div style="margin-top:6px;color:var(--accent)">Fórmula Epley · estimación teórica</div>
+  `;
+}
+
+// ════════════════════════════════════════════════════════
+// MUSCLE MODAL (simplified)
+// ════════════════════════════════════════════════════════
+const MUSCLE_NAMES = {
+  chest:'Pectoral',chest_up:'Pectoral superior',chest_low:'Pectoral inferior',
+  triceps:'Tríceps',front_delt:'Deltoides anterior',abs:'Abdominales',
+  obliques:'Oblicuos',hip_flexors:'Flexores cadera',lats:'Dorsal ancho',
+  trapezius:'Trapecio',biceps:'Bíceps',quads:'Cuádriceps',
+  hamstrings:'Isquiotibiales',glutes:'Glúteos',calves:'Gemelos',
+  lumbar:'Lumbar',rear_delt:'Deltoides posterior'
+};
+
+function showMuscle(exId){
+  let ex = null;
+  DAYS.forEach(d=>{ WK[d].exercises?.forEach(e=>{ if(e.id===exId) ex=e; }); });
+  if(!ex) return;
+  document.getElementById('muscleTitle').textContent = ex.name;
+  document.getElementById('muscleSubtitle').textContent = (ex.muscles||[]).map(m=>MUSCLE_NAMES[m]||m).join(' · ');
+  document.getElementById('muscleCues').innerHTML = `<div style="font-size:13px;color:var(--text2);line-height:1.6;">💡 ${ex.tip}</div>`;
+  document.getElementById('muscleHist').innerHTML = `<div style="font-size:11px;color:var(--muted);">📊 ${ex.sets} series × ${ex.reps}</div>`;
+
+  // Draw simple muscle map on canvas
+  const canvas = document.getElementById('muscleCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 300; canvas.height = 200;
+  ctx.fillStyle = '#f0f0f0';
+  ctx.fillRect(0,0,300,200);
+  ctx.fillStyle = '#FF4D00';
+  ctx.font = 'bold 13px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText((ex.muscles||[]).map(m=>MUSCLE_NAMES[m]||m).join(', '), 150, 100);
+  ctx.fillStyle='#888';
+  ctx.font='11px sans-serif';
+  ctx.fillText(ex.name, 150, 125);
+
+  openModal('muscleOv');
+}
+
+function closeMuscle(){ closeModal('muscleOv'); }
+
+// ════════════════════════════════════════════════════════
+// TIMER
+// ════════════════════════════════════════════════════════
+let timerInterval = null, timerLeft = 0, timerTotal = 0, timerPaused = false;
+
+function startTimer(secs, label){
+  timerLeft = secs; timerTotal = secs; timerPaused = false;
+  document.getElementById('timerFull').classList.add('on');
+  document.getElementById('timerFull').classList.remove('done');
+  document.getElementById('timerExLbl').textContent = label || '';
+  document.getElementById('pauseBtn').textContent = 'Pausar';
+  updateTimerDisplay();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    if(timerPaused) return;
+    timerLeft--;
+    if(timerLeft <= 0){
+      clearInterval(timerInterval);
+      timerLeft = 0;
+      document.getElementById('timerFull').classList.add('done');
+      if('vibrate' in navigator) navigator.vibrate([200,100,200]);
+    }
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function updateTimerDisplay(){
+  document.getElementById('timerNum').textContent = timerLeft;
+  const pct = timerTotal > 0 ? timerLeft/timerTotal : 0;
+  const circ = 615.75;
+  document.getElementById('ringFg').style.strokeDashoffset = (circ - circ*pct);
+}
+
+function stopTimer(){
+  clearInterval(timerInterval);
+  document.getElementById('timerFull').classList.remove('on','done');
+}
+
+function togglePause(){
+  timerPaused = !timerPaused;
+  document.getElementById('pauseBtn').textContent = timerPaused ? 'Reanudar' : 'Pausar';
+}
+
+function addTime(s){
+  timerLeft = Math.max(0, timerLeft + s);
+  timerTotal = Math.max(timerTotal, timerLeft);
+  updateTimerDisplay();
+}
+
+// ════════════════════════════════════════════════════════
+// MODALS / TOAST
+// ════════════════════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('on'); }
+function closeModal(id){ document.getElementById(id).classList.remove('on'); }
+
+let toastTimer;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('on'), 2200);
+}
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', setupInit);
+</script>
+</body>
+</html>
