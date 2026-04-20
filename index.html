@@ -510,7 +510,7 @@ const WK={
       {id:'l4',block:0,name:'Fondos en banco',sets:3,reps:'8',rt:'medium',
        muscles:['triceps','chest_low'],
        tip:'Espalda pegada al banco. Baja hasta sentir el estiramiento. Sube sin bloquear.'},
-      {id:'l5',block:1,name:'Plancha',sets:3,reps:'30s',rt:'core',isTime:true,
+      {id:'l5',block:1,name:'Plancha',sets:1,reps:'90s',rt:'core',isTime:true,
        muscles:['abs','obliques'],
        tip:'Cuerpo recto de cabeza a talones. Core y glúteos apretados. Respira.'},
       
@@ -546,7 +546,7 @@ const WK={
       {id:'m4',block:0,name:'Elevaciones de rodillas en barra',sets:3,reps:'8',rt:'core',
        muscles:['abs','hip_flexors'],
        tip:'Colgado sin balanceo. Sube rodillas al pecho con control. Baja lento.'},
-      {id:'m5',block:1,name:'Plancha',sets:3,reps:'30s',rt:'core',isTime:true,
+      {id:'m5',block:1,name:'Plancha',sets:1,reps:'90s',rt:'core',isTime:true,
        muscles:['abs','obliques'],
        tip:'Cierra el entreno. Todos los músculos tensos. Respira con el diafragma.'},
       {id:'m6',block:1,name:'Russian twists',sets:3,reps:'20 c/lado',rt:'core',
@@ -596,7 +596,7 @@ const WK={
       {id:'sa7',block:1,name:'Puente de glúteo',sets:3,reps:'15',rt:'medium',
        muscles:['glutes','hamstrings'],
        tip:'Pies apoyados, caderas arriba. Aprieta glúteos 1s arriba. Baja despacio.'},
-      {id:'sa8',block:2,name:'Plancha',sets:1,reps:'60s',rt:'core',isTime:true,
+      {id:'sa8',block:2,name:'Plancha',sets:1,reps:'90s',rt:'core',isTime:true,
        muscles:['abs','obliques'],
        tip:'Cuerpo recto de cabeza a talones. Core apretado. Respira con control.'},
       {id:'sa9',block:2,name:'Elevaciones de piernas tumbado',sets:3,reps:'12',rt:'core',
@@ -641,7 +641,7 @@ const WK={
       {id:'d8',block:1,name:'Crunch bicicleta',sets:3,reps:'20 c/lado',rt:'core',
        muscles:['abs','obliques'],
        tip:'Codo al lado contrario alternando despacio y controlado.'},
-      {id:'d9',block:1,name:'Plancha',sets:1,reps:'60s',rt:'core',isTime:true,
+      {id:'d9',block:1,name:'Plancha',sets:1,reps:'90s',rt:'core',isTime:true,
        muscles:['abs','obliques'],
        tip:'Cuerpo recto de cabeza a talones. Core apretado. Respira con control.'},
     ]}
@@ -654,6 +654,60 @@ let STATE = JSON.parse(localStorage.getItem('forge_state') || '{}');
 const todayKey = () => DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
 function saveState(){localStorage.setItem('forge_state', JSON.stringify(STATE));}
 function saveUser(){localStorage.setItem('forge_user', JSON.stringify(U));}
+
+// ════════════════════════════════════════════════════════
+// WEEKLY RESET
+// ════════════════════════════════════════════════════════
+const TRAINING_DAYS = ['lunes','miercoles','sabado','domingo'];
+
+function getWeekKey() {
+  const d = new Date();
+  const day = d.getDay(); // 0=domingo
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  return monday.toISOString().split('T')[0];
+}
+
+function checkWeeklyReset() {
+  const currentWeekKey = getWeekKey();
+  if (!STATE.weekKey) {
+    STATE.weekKey = currentWeekKey;
+    saveState();
+    return;
+  }
+  if (STATE.weekKey === currentWeekKey) return;
+
+  // ¡Nueva semana! Evaluar la semana que acaba de terminar
+  const allDone = TRAINING_DAYS.every(d => {
+    const wk = WK[d];
+    if (wk.rest) return true;
+    const done = STATE[d]?.done || [];
+    return done.length >= wk.exercises.length;
+  });
+
+  if (allDone) {
+    U.streak = (U.streak || 0) + 1;
+    setTimeout(() => toast('🏆 ¡Semana completada! Racha semana ' + U.streak), 600);
+  } else {
+    U.streak = 0;
+  }
+
+  // Guardar datos de la semana anterior para mostrar "sesión anterior"
+  STATE.lastWeek = {};
+  TRAINING_DAYS.forEach(d => {
+    if (STATE[d]) {
+      STATE.lastWeek[d] = { sets: JSON.parse(JSON.stringify(STATE[d].sets || {})) };
+    }
+  });
+
+  // Resetear datos de la semana actual
+  TRAINING_DAYS.forEach(d => { delete STATE[d]; });
+
+  STATE.weekKey = currentWeekKey;
+  saveUser();
+  saveState();
+  updateHeader();
+}
 
 // ════════════════════════════════════════════════════════
 // SETUP / ONBOARDING
@@ -724,6 +778,7 @@ function showApp(){
   document.getElementById('mainHdr').style.display='';
   document.getElementById('mainNav').style.display='';
   document.querySelectorAll('.page').forEach(p=>p.style.display='');
+  checkWeeklyReset();
   updateHeader();
   goPage('home');
 }
@@ -891,6 +946,24 @@ function renderWorkout(day){
       const savedSets = (STATE[day]?.sets||{})[ex.id] || [];
       const isTime = ex.isTime;
 
+      // Sesión anterior
+      const prevSets = (STATE.lastWeek?.[day]?.sets?.[ex.id]) || [];
+      let prevSummary = '';
+      if (prevSets.some(sv => sv && (sv.reps || sv.time || sv.kg))) {
+        if (isTime) {
+          const vals = prevSets.map(sv => sv?.time ? sv.time+'s' : null).filter(Boolean);
+          if (vals.length) prevSummary = vals.join(' / ');
+        } else {
+          const vals = prevSets.map(sv => {
+            if (!sv) return null;
+            const r = sv.reps || '?';
+            const k = sv.kg ? '×'+sv.kg+'kg' : '';
+            return r + k;
+          }).filter(Boolean);
+          if (vals.length) prevSummary = vals.join(' / ');
+        }
+      }
+
       // Build sets rows
       let setsHtml = `<div style="padding:0 16px 12px;">
         <div style="display:grid;grid-template-columns:28px 1fr${isTime?'':' 1fr'} 44px;gap:6px;align-items:center;margin-bottom:6px;">
@@ -906,18 +979,23 @@ function renderWorkout(day){
       for(let s=0; s<ex.sets; s++){
         const sv = savedSets[s] || {};
         const setDone = sv.done || false;
+        const prevSv = prevSets[s] || {};
+        const prevRepsPlaceholder = isTime
+          ? (prevSv.time ? prevSv.time : ex.reps.replace('s',''))
+          : (prevSv.reps ? prevSv.reps : (isNaN(parseInt(ex.reps))?'—':parseInt(ex.reps)));
+        const prevKgPlaceholder = prevSv.kg ? prevSv.kg : 'kg';
         setsHtml += `<div id="setrow_${ex.id}_${s}" style="display:grid;grid-template-columns:28px 1fr${isTime?'':' 1fr'} 44px;gap:6px;align-items:center;margin-bottom:6px;">
           <div style="width:26px;height:26px;border-radius:50%;background:${setDone?'var(--green)':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${setDone?'#000':'var(--muted)'};">${s+1}</div>
           ${isTime
-            ? `<input type="number" inputmode="numeric" placeholder="${ex.reps.replace('s','')}"
+            ? `<input type="number" inputmode="numeric" placeholder="${prevRepsPlaceholder}"
                 style="height:36px;background:var(--bg3);border:1.5px solid ${setDone?'var(--green)':'var(--border)'};border-radius:8px;color:var(--text);font-size:15px;font-weight:700;text-align:center;outline:none;width:100%;"
                 value="${sv.time||''}"
                 onchange="saveSetVal('${day}','${ex.id}',${s},'time',this.value)">`
-            : `<input type="number" inputmode="numeric" placeholder="${isNaN(parseInt(ex.reps))?'—':parseInt(ex.reps)}"
+            : `<input type="number" inputmode="numeric" placeholder="${prevRepsPlaceholder}"
                 style="height:36px;background:var(--bg3);border:1.5px solid ${setDone?'var(--green)':'var(--border)'};border-radius:8px;color:var(--text);font-size:15px;font-weight:700;text-align:center;outline:none;width:100%;"
                 value="${sv.reps||''}"
                 onchange="saveSetVal('${day}','${ex.id}',${s},'reps',this.value)">
-               <input type="number" inputmode="decimal" placeholder="kg"
+               <input type="number" inputmode="decimal" placeholder="${prevKgPlaceholder}"
                 style="height:36px;background:var(--bg3);border:1.5px solid ${setDone?'var(--green)':'var(--border)'};border-radius:8px;color:var(--text);font-size:15px;font-weight:700;text-align:center;outline:none;width:100%;"
                 value="${sv.kg||''}"
                 onchange="saveSetVal('${day}','${ex.id}',${s},'kg',this.value)">`
@@ -933,7 +1011,7 @@ function renderWorkout(day){
         <div class="ex-head">
           <div>
             <div class="ex-name" onclick="showMuscle('${ex.id}')" style="cursor:pointer">${ex.name} <span style="font-size:11px;color:var(--muted)">💪</span></div>
-            <div class="ex-meta">${ex.sets} series · ${ex.reps} · <span class="pill pill-${ex.rt==='heavy'?'h':ex.rt==='medium'?'m':'c'}">${ex.rt}</span></div>
+            <div class="ex-meta">${ex.sets} series · ${ex.reps} · <span class="pill pill-${ex.rt==='heavy'?'h':ex.rt==='medium'?'m':'c'}">${ex.rt}</span>${prevSummary ? ` · <span style="color:var(--blue);font-size:10px;">Ant: ${prevSummary}</span>` : ''}</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
             ${isDone ? `<span style="color:var(--green);font-size:18px;">✓</span>` : `<button onclick="markDone('${day}','${ex.id}')" style="background:var(--accent);border:none;border-radius:8px;color:#000;padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;">✓ Hecho</button>`}
@@ -1009,22 +1087,10 @@ function markDone(day, exId){
 }
 
 function checkStreak(day){
-  const today = todayKey();
-  if(day !== today) return;
-  const wk = WK[today];
-  if(wk.rest) return;
-  const done = STATE[today]?.done||[];
-  if(done.length >= wk.exercises.length){
-    const lastWO = U.lastWorkout;
-    const todayStr = new Date().toISOString().split('T')[0];
-    if(lastWO !== todayStr){
-      const yest = new Date(); yest.setDate(yest.getDate()-1);
-      const yestStr = yest.toISOString().split('T')[0];
-      U.streak = (lastWO === yestStr ? (U.streak||0)+1 : 1);
-      U.lastWorkout = todayStr;
-      saveUser(); updateHeader();
-    }
-  }
+  // La racha ahora es semanal: se calcula en checkWeeklyReset() al inicio de cada semana.
+  // Aquí solo guardamos que este día se completó, para que el reset semanal lo evalúe.
+  saveState();
+  updateHeader();
 }
 
 // ════════════════════════════════════════════════════════
