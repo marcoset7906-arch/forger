@@ -674,6 +674,13 @@ function getWeekKey() {
   return monday.toISOString().split('T')[0];
 }
 
+function resetDayProgress(day){
+  if(STATE[day]){ delete STATE[day]; saveState(); }
+  toast('✅ Entreno de ' + WK[day].name + ' reseteado');
+  renderWorkout(day);
+  renderHome();
+}
+
 function checkWeeklyReset() {
   const currentWeekKey = getWeekKey();
   if (!STATE.weekKey) {
@@ -1240,6 +1247,14 @@ function renderProfile(){
       </div>
       <div class="setting-row" onclick="openModal('ormOv')">
         <div class="sr-left"><div class="sr-ico" style="background:rgba(255,184,0,.1);">🏋️</div><div><div class="sr-title">Calculadora 1RM</div><div class="sr-sub">Máximo teórico por ejercicio</div></div></div>
+        <span style="color:var(--muted)">›</span>
+      </div>
+      <div class="setting-row" onclick="if(confirm('¿Resetear el progreso del Miércoles?')) resetDayProgress('miercoles')">
+        <div class="sr-left"><div class="sr-ico" style="background:rgba(64,196,255,.1);">🔁</div><div><div class="sr-title">Resetear Miércoles</div><div class="sr-sub">Borra el progreso guardado de ese día</div></div></div>
+        <span style="color:var(--muted)">›</span>
+      </div>
+      <div class="setting-row" onclick="if(confirm('¿Resetear el progreso del Domingo?')) resetDayProgress('domingo')">
+        <div class="sr-left"><div class="sr-ico" style="background:rgba(64,196,255,.1);">🔁</div><div><div class="sr-title">Resetear Domingo</div><div class="sr-sub">Borra el progreso guardado de ese día</div></div></div>
         <span style="color:var(--muted)">›</span>
       </div>
       <div class="setting-row" onclick="confirmReset()">
