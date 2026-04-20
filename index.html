@@ -675,7 +675,16 @@ function getWeekKey() {
 }
 
 function resetDayProgress(day){
-  if(STATE[day]){ delete STATE[day]; saveState(); }
+  if(STATE[day]){
+    // Archivar en lastWeek antes de borrar
+    if(!STATE.lastWeek) STATE.lastWeek = {};
+    STATE.lastWeek[day] = {
+      sets: JSON.parse(JSON.stringify(STATE[day].sets || {})),
+      done: JSON.parse(JSON.stringify(STATE[day].done || []))
+    };
+    delete STATE[day];
+    saveState();
+  }
   toast('✅ Entreno de ' + WK[day].name + ' reseteado');
   renderWorkout(day);
   renderHome();
@@ -683,14 +692,20 @@ function resetDayProgress(day){
 
 function checkWeeklyReset() {
   const currentWeekKey = getWeekKey();
+
+  // Primera vez que abre la app: inicializar weekKey sin resetear nada
   if (!STATE.weekKey) {
     STATE.weekKey = currentWeekKey;
     saveState();
     return;
   }
+
+  // Misma semana: no hacer nada
   if (STATE.weekKey === currentWeekKey) return;
 
-  // ¡Nueva semana! Evaluar la semana que acaba de terminar
+  // ── NUEVA SEMANA detectada ──────────────────────────────
+
+  // 1. Evaluar si completó todos los entrenos de la semana que acaba
   const allDone = TRAINING_DAYS.every(d => {
     const wk = WK[d];
     if (wk.rest) return true;
@@ -700,22 +715,37 @@ function checkWeeklyReset() {
 
   if (allDone) {
     U.streak = (U.streak || 0) + 1;
-    setTimeout(() => toast('🏆 ¡Semana completada! Racha semana ' + U.streak), 600);
+    setTimeout(() => toast('🏆 ¡Semana completada! Racha ' + U.streak + ' semanas'), 800);
   } else {
     U.streak = 0;
   }
 
-  // Guardar datos de la semana anterior para mostrar "sesión anterior"
-  STATE.lastWeek = {};
+  // 2. Archivar la semana que termina en el historial acumulado
+  //    Estructura: STATE.history = [ { week:'2025-W22', days:{ lunes:{sets,done}, ... } }, ... ]
+  if (!STATE.history) STATE.history = [];
+
+  const weekSnapshot = { week: STATE.weekKey, days: {} };
   TRAINING_DAYS.forEach(d => {
     if (STATE[d]) {
-      STATE.lastWeek[d] = { sets: JSON.parse(JSON.stringify(STATE[d].sets || {})) };
+      weekSnapshot.days[d] = {
+        sets: JSON.parse(JSON.stringify(STATE[d].sets || {})),
+        done: JSON.parse(JSON.stringify(STATE[d].done || []))
+      };
     }
   });
+  // Guardar solo si hubo algún dato registrado
+  if (Object.keys(weekSnapshot.days).length > 0) {
+    STATE.history.unshift(weekSnapshot);        // más reciente primero
+    if (STATE.history.length > 12) STATE.history = STATE.history.slice(0, 12); // máx 12 semanas
+  }
 
-  // Resetear datos de la semana actual
+  // 3. Actualizar lastWeek (usada para mostrar "Ant:" en cada ejercicio)
+  STATE.lastWeek = weekSnapshot.days;
+
+  // 4. Resetear los días de la semana actual
   TRAINING_DAYS.forEach(d => { delete STATE[d]; });
 
+  // 5. Actualizar clave de semana y guardar todo
   STATE.weekKey = currentWeekKey;
   saveUser();
   saveState();
